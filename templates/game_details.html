@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block content %}
+    <!-- Inside your <main> tag -->
+    <main class="container">
+        <div class="game-details-container">
+            <!-- Developer Section -->
+            <div class="detail-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user-tie"></i> معلومات المطور
+                </h2>
+                <div class="developer-card">
+                    <div class="developer-avatar">
+                        <i class="fas fa-user-circle fa-3x"></i>
+                    </div>
+                    <div class="developer-info">
+                        <h3>{{ game.developer }}</h3>
+                        <p class="developer-account">{{ game.developer_account }}</p>
+                        <div class="developer-stats">
+                            <span><i class="fas fa-gamepad"></i> 5 ألعاب</span>
+                            <span><i class="fas fa-star"></i> 4.3 تقييم</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Main Info -->
+            <div class="detail-section game-main-content">
+                <div class="game-header">
+                    <div class="game-poster">
+                        <img src="{{ game.thumbnail }}" alt="{{ game.title }}">
+                    </div>
+                    <div class="game-meta">
+                        <h1 class="game-title">{{ game.title }}</h1>
+                        
+                        <div class="rating">
+                            {% for i in range(5) %}
+                                {% if i < game.rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span>{{ game.rating }}</span>
+                            <span class="downloads"><i class="fas fa-download"></i> {{ game.downloads }} تنزيل</span>
+                        </div>
+                        
+                        <p class="game-description">{{ game.description }}</p>
+                        
+                        <div class="game-specs-grid">
+                            <div class="game-spec">
+                                <div class="spec-label">تاريخ الإصدار</div>
+                                <div class="spec-value">{{ game.release_date }}</div>
+                            </div>
+                            <div class="game-spec">
+                                <div class="spec-label">حجم اللعبة</div>
+                                <div class="spec-value">{{ game.size }}</div>
+                            </div>
+                            <div class="game-spec">
+                                <div class="spec-label">الإصدار</div>
+                                <div class="spec-value">{{ game.version }}</div>
+                            </div>
+                            <div class="game-spec">
+                                <div class="spec-label">النوع</div>
+                                <div class="spec-value">رعب/مغامرة</div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-actions">
+                            <button class="btn btn-download">
+                                <i class="fas fa-download"></i> تنزيل اللعبة
+                            </button>
+                            <div class="price">
+                                {% if game.price > 0 %}
+                                    <span>{{ game.price }} ر.س</span>
+                                {% else %}
+                                    <span class="free-badge">مجاني</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Video -->
+                <div class="video-container">
+                    <iframe width="100%" 
+                            height="500" 
+                            src="{{ game.video_url }}?rel=0&modestbranding=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+                
+                <!-- Screenshots -->
+                <div class="screenshots-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-images"></i> لقطات من اللعبة
+                    </h2>
+                    <div class="screenshots-grid">
+                        {% for image in game.images %}
+                        <div class="screenshot">
+                            <img src="{{ image }}" alt="لقطة {{ loop.index }} من {{ game.title }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

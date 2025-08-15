@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - منصة ألعاب عربية{% endblock %}
+
+{% block content %}
+
+    <main class="container">
+        <section class="upload-section">
+            <h1><i class="fas fa-upload"></i> رفع لعبة جديدة</h1>
+            
+            <form id="uploadForm" class="upload-form">
+                <div class="form-group">
+                    <label for="gameTitle">اسم اللعبة</label>
+                    <input type="text" id="gameTitle" name="gameTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gameDescription">وصف اللعبة</label>
+                    <textarea id="gameDescription" name="gameDescription" rows="5" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gameCategory">تصنيف اللعبة</label>
+                        <select id="gameCategory" name="gameCategory" required>
+                            <option value="">اختر التصنيف</option>
+                            <option value="action">أكشن</option>
+                            <option value="adventure">مغامرة</option>
+                            <option value="puzzle">ألغاز</option>
+                            <option value="strategy">إستراتيجية</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gamePrice">السعر (ر.س)</label>
+                        <input type="number" id="gamePrice" name="gamePrice" min="0" value="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-group file-upload">
+                    <label>ملفات اللعبة</label>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>اسحب وأفلت ملفات اللعبة هنا أو انقر للاختيار</p>
+                        <input type="file" id="gameFiles" name="gameFiles" multiple required>
+                    </div>
+                    <div id="fileList" class="file-list"></div>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label for="agreeTerms">أوافق على شروط وأحكام المنصة</label>
+                </div>
+                
+                <button type="submit" class="btn btn-upload">
+                    <i class="fas fa-upload"></i> رفع اللعبة
+                </button>
+            </form>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+
+{% endblock %}

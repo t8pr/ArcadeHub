@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - منصة ألعاب عربية{% endblock %}
+
+{% block content %}
+    <main class="container">
+        <section class="games-section">
+            <h1><i class="fas fa-gamepad"></i> الألعاب المتاحة</h1>
+            
+            <div class="games-grid">
+                {% for game in games %}
+                <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="game-card">
+                    <div class="game-thumbnail">
+                        <img src="{{ game.thumbnail }}" alt="{{ game.title }}">
+                    </div>
+                    <div class="game-info">
+                        <h3>{{ game.title }}</h3>
+                        <p class="developer">{{ game.developer }}</p>
+                        <p class="description">{{ game.short_description }}</p>
+                        <div class="game-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i> {{ game.rating }}
+                            </div>
+                            <div class="price">
+                                {% if game.price > 0 %}
+                                    {{ game.price }} ر.س
+                                {% else %}
+                                    مجاني
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+{% endblock %}

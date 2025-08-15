@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}منصة ألعاب عربية{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+        <nav>
+            <div class="nav-container">
+                <div class="logo-container">
+                    <a href="{{ url_for('home') }}" class="logo-link">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="site-logo" onerror="this.style.display='none'">
+                        <span class="logo-text">SaudiArcade</span>
+                    </a>
+                </div>
+                <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="قائمة الهاتف">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="{{ url_for('home') }}"><i class="fas"></i> الرئيسية</a></li>
+                    <li><a href="{{ url_for('games') }}"><i class="fas"></i> الألعاب</a></li>
+                    <li><a href="{{ url_for('upload') }}"><i class="fas "></i> رفع لعبة</a></li>
+                    <li><a href="#"><i class="fas"></i> اتصل بنا</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="header-line"></div>
+    </header>
+
+    {% block content %}{% endblock %}
+    <button id="themeToggle">
+    </button>
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2023 منصة ألعاب عربية</p>
+    </footer>
+
+    <script>
+
+        // Close menu when clicking on a link or outside
+        document.addEventListener('click', (e) => {
+            const isClickInsideMenu = navLinks.contains(e.target);
+            const isClickOnToggle = mobileNavToggle.contains(e.target);
+            
+            if (!isClickInsideMenu && !isClickOnToggle && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                body.classList.remove('menu-open');
+                mobileNavToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            }
+        });
+
+        // Close menu when resizing to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                body.classList.remove('menu-open');
+                mobileNavToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            }
+        });
+                // Dark Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const icon = themeToggle.querySelector('i');
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            document.body.classList.add('dark-mode');
+            icon.classList.replace('fa-moon', 'fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>

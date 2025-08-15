@@ -1,0 +1,1433 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Tajawal', 'Noto Naskh Arabic', sans-serif;
+    direction: rtl;
+    color: #333;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+}
+
+/* Improved Arabic Font */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Header Styles */
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav {
+    display: flex;
+    justify-content: center; /* Center the nav */
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-left: 2rem; /* Space between logo and nav */
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.nav-links li {
+    margin: 0 1rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+
+.nav-links a:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    right: 0;
+    background-color: #003522 ;
+    transition: width 0.3s;
+}
+
+.nav-links a:hover:after {
+    width: 100%;
+    right: 0;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 5rem 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: 1200px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Footer */
+footer {
+    background-color: #2c3e50;
+    color: #fff;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+    }
+    
+    .logo {
+        margin: 0 0 1rem 0;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-links li {
+        margin: 0.5rem 0;
+    }
+}
+/* Feature Boxes Section - Varied Sizes */
+.features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 1.5rem;
+    margin: 3rem auto;
+}
+
+.feature-box {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Large Box (span 2 columns) */
+.feature-box.large {
+    grid-column: span 2;
+    min-height: 250px;
+    justify-content: center;
+    background: linear-gradient(135deg, #2EC630 , #003522 );
+    color: white;
+}
+
+.feature-box.large .feature-icon {
+    color: white;
+}
+
+.feature-box.large h3 {
+    color: white;
+}
+
+.feature-box.large p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Tall Box (span 2 rows) */
+.feature-box.tall {
+    grid-row: span 2;
+    min-height: 400px;
+    justify-content: flex-start;
+}
+
+/* Small Boxes */
+.feature-box.small {
+    min-height: 150px;
+}
+
+.feature-icon {
+    font-size: 2rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+}
+
+.feature-box h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+    color: #2c3e50;
+}
+
+.feature-box p {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Responsive Grid */
+@media (max-width: 992px) {
+    .features {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .feature-box.large {
+        grid-column: span 2;
+    }
+    .feature-box.tall {
+        grid-row: span 1;
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .features {
+        grid-template-columns: 1fr;
+    }
+    .feature-box {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+    }
+}
+
+.btn {
+    background-color: #01432b;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #025a3a;
+}
+
+.fa-trophy:before, .fa-award:before, .fa-users:before,.fa-upload:before {
+    color: #2EC630 ;
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+
+.dark-mode header {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .logo {
+    color: #f0f0f0;
+}
+
+.dark-mode .nav-links a {
+    color: #f0f0f0;
+}
+
+.dark-mode .nav-links a:hover {
+    color: #8f8f8f;
+}
+
+.dark-mode .hero,
+.dark-mode .feature-box:not(.large) {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .feature-box h3 {
+    color: #f0f0f0;
+}
+
+.dark-mode .feature-box p {
+    color: #efeeee;
+}
+
+.dark-mode footer {
+    background-color: #0d0d0d;
+}
+
+/* Dark Mode Toggle Button */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+[dir="rtl"] .theme-toggle {
+    left: auto;
+    right: 20px;
+}
+
+.feature-box.large {
+    background: linear-gradient(135deg, #2EC630 , #003522 ) !important;
+}
+
+/* Status Bar Styles */
+.status-bar {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.status-item {
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+}
+
+.status-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #3498db;
+}
+
+.status-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Animation for numbers */
+@keyframes counter {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.status-number {
+    animation: counter 1s ease-out;
+}
+
+/* Dark mode adjustments */
+.dark-mode .status-bar {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+}
+
+.dark-mode .status-number {
+    color: #2EC630  ;
+}
+
+/* Upload Page Styles */
+.upload-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+}
+
+.upload-section h1 {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* File Upload Styles */
+.file-upload {
+    margin: 1.5rem 0;
+}
+
+.upload-area {
+    border: 2px dashed #3498db;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-area:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.upload-area i {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+}
+
+.upload-area p {
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.upload-area input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-item {
+    background: #f8f9fa;
+    padding: 0.8rem;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-item .file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.file-item .file-icon {
+    color: #3498db;
+}
+
+.file-item .file-remove {
+    color: #e74c3c;
+    cursor: pointer;
+}
+
+/* Checkbox Styles */
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.checkbox-group input {
+    width: auto;
+}
+
+/* Upload Button */
+.btn-upload {
+    align-self: flex-start;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .upload-section,
+.dark-mode .file-item {
+    background-color: #1e1e1e;
+}
+
+.dark-mode .upload-section h1,
+.dark-mode .form-group label {
+    color: #f0f0f0;
+}
+
+.dark-mode .form-group input,
+.dark-mode .form-group textarea,
+.dark-mode .form-group select,
+.dark-mode .file-item {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #f0f0f0;
+}
+
+.dark-mode .upload-area {
+    border-color: #4fc3f7;
+    background-color: rgba(79, 195, 247, 0.05);
+}
+
+.dark-mode .upload-area i {
+    color: #4fc3f7;
+}
+
+.dark-mode .upload-area p {
+    color: #b0b0b0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .btn-upload {
+        width: 100%;
+    }
+}
+/* File Upload Styles */
+
+/* Games Page Specific Styles */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-filter {
+    display: flex;
+    gap: 1rem;
+}
+
+.search-filter input {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 250px;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.search-filter select {
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.game-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.game-thumbnail {
+    height: 180px;
+    overflow: hidden;
+}
+
+.game-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.game-card:hover .game-thumbnail img {
+    transform: scale(1.05);
+}
+
+.game-info {
+    padding: 1.2rem;
+}
+
+.game-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.game-info .developer {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+}
+
+.game-info .description {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.4;
+}
+
+.game-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rating {
+    color: #f39c12;
+    font-weight: 500;
+}
+
+.price {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.price.free {
+    color: #27ae60;
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .game-card {
+    background-color: #1e1e1e;
+}
+
+.dark-mode .game-info h3 {
+    color: #f0f0f0;
+}
+
+.dark-mode .game-info .description {
+    color: #d0d0d0;
+}
+
+.dark-mode .price {
+    color: #f0f0f0;
+}
+
+.dark-mode .search-filter input,
+.dark-mode .search-filter select {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #f0f0f0;
+}
+/* Games Page Specific Styles */
+
+/* Pagination Styles (for later) */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    gap: 0.5rem;
+}
+
+.pagination a {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #2c3e50;
+}
+
+.pagination a.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-filter {
+        width: 100%;
+    }
+    
+    .search-filter input {
+        min-width: auto;
+        flex: 1;
+    }
+}
+
+@media (max-width: 576px) {
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Game Details Page Styles */
+.game-details {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.developer-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.developer-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.developer-avatar i {
+    font-size: 3.5rem;
+    color: #3498db;
+}
+
+.developer-info h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.developer-account {
+    color: #7f8c8d;
+    margin: 0.5rem 0;
+}
+
+.developer-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.developer-stats span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #555;
+}
+
+.game-header {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.game-poster {
+    flex: 1;
+    max-width: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.game-poster img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.game-meta h1 {
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    color: #f39c12;
+}
+
+.rating .downloads {
+    color: #7f8c8d;
+}
+
+.game-description {
+    color: #555;
+    line-height: 1.6;
+    margin: 1.5rem 0;
+}
+
+.game-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.game-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.spec {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.spec-label {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.spec-value {
+    color: #555;
+}
+
+.game-video-section {
+    margin: 3rem 0;
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    margin-top: 1rem;
+    border-radius: 8px;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.screenshots-section {
+    margin: 3rem 0;
+}
+
+.screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.screenshot {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.screenshot:hover {
+    transform: scale(1.02);
+}
+
+.screenshot img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Dark Mode Styles */
+.dark-mode .game-details,
+.dark-mode .developer-card {
+    background: #2d2d2d;
+}
+
+.dark-mode .developer-info h3,
+.dark-mode .game-meta h1,
+.dark-mode .spec-label,
+.dark-mode .price {
+    color: #f0f0f0;
+}
+
+.dark-mode .developer-account,
+.dark-mode .spec-value,
+.dark-mode .game-description {
+    color: #d0d0d0;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .game-header {
+        flex-direction: column;
+    }
+    
+    .game-poster {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .game-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .screenshots-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .game-specs-grid {
+        display: grid;
+    }
+}
+/* Improved Game Details Layout */
+.game-details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.game-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.game-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.game-poster {
+    flex: 1;
+    min-width: 300px;
+    max-width: 450px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.game-meta {
+    flex: 2;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+.game-description {
+    line-height: 1.7;
+    color: #555;
+    margin: 1.5rem 0;
+    font-size: 1.05rem;
+}
+
+.game-specs-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 800px) {
+    .game-specs-grid {
+        display: grid;
+    }
+}
+
+.game-spec {
+    background: #f8f9fa;
+    padding: 0.8rem;
+    border-radius: 6px;
+}
+
+.spec-label {
+    font-weight: 600;
+    color: #3498db;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.spec-value {
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.game-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1.5rem;
+}
+
+/* Sections */
+.detail-section {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.section-title {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+/* Developer Card */
+.developer-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+    }
+    
+    .game-poster {
+        max-width: 100%;
+    }
+    
+    .game-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Dark Mode Adjustments */
+.dark-mode .game-header,
+.dark-mode .detail-section {
+    background: #2d2d2d;
+}
+
+.dark-mode .game-title,
+.dark-mode .section-title,
+.dark-mode .spec-value {
+    color: #f0f0f0;
+}
+
+.dark-mode .game-description {
+    color: #d0d0d0;
+}
+
+.dark-mode .game-spec {
+    background: #3d3d3d;
+}
+
+.dark-mode .developer-card {
+    background: #3d3d3d;
+}
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    margin-top: 1rem;
+    border-radius: 8px;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Game Details Page Specific Styles */
+
+/* Mobile Navigation */
+.mobile-nav-toggle {
+    display: none; /* Hidden by default on desktop */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+/* Mobile Navigation Styles */
+.mobile-nav-toggle {
+    display: none; /* Hidden by default on desktop */
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #2c3e50;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .mobile-nav-toggle {
+        display: block; /* Show burger icon on mobile */
+        z-index: 1001;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%; /* Start off-screen for RTL */
+        width: 70%;
+        height: 100vh;
+        background: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 5rem 1.5rem 1.5rem;
+        gap: 0;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1); /* Shadow on left side for RTL */
+        transition: right 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .nav-links.active {
+        right: 0; /* Slide in from right */
+    }
+    
+    .nav-links li {
+        width: 100%;
+    }
+    
+    .nav-links a {
+        display: block;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        width: 100%;
+    }
+    
+    /* Dark mode mobile adjustments */
+    .dark-mode .nav-links {
+        background: #2d2d2d;
+    }
+    
+    .dark-mode .nav-links a {
+        border-bottom-color: #444;
+    }
+    
+    .dark-mode .mobile-nav-toggle {
+        color: #f0f0f0;
+    }
+}
+
+/* Ensure body doesn't scroll when menu is open */
+body.menu-open {
+    overflow: hidden;
+}
+
+/* Base page layout for mobile */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 0 10px;
+    }
+    
+    .game-header {
+        flex-direction: column;
+    }
+    
+    .game-poster {
+        max-width: 100%;
+    }
+    
+    .game-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-download {
+        width: 100%;
+    }
+}
+
+/* Search Container Styles */
+.search-container {
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-box i {
+    color: #7f8c8d;
+    margin-left: 0.5rem;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 0.5rem;
+    font-family: 'Tajawal', sans-serif;
+    flex-grow: 1;
+    background: transparent;
+}
+
+.search-box select {
+    border: none;
+    outline: none;
+    padding: 0.5rem;
+    font-family: 'Tajawal', sans-serif;
+    background: transparent;
+    border-right: 1px solid #eee;
+    margin-right: 0.5rem;
+}
+
+/* Dark Mode Search */
+.dark-mode .search-box {
+    background: #2d2d2d;
+}
+
+.dark-mode .search-box input,
+.dark-mode .search-box select {
+    color: #f0f0f0;
+    background: transparent;
+}
+
+.dark-mode .search-box select {
+    border-right-color: #444;
+}
+
+.btn-clear-filters {
+    background: #f8f9fa;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Tajawal', sans-serif;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+}
+
+.btn-clear-filters:hover {
+    background: #e9ecef;
+}
+
+.dark-mode .btn-clear-filters {
+    background: #3d3d3d;
+    color: #f0f0f0;
+}
+
+.dark-mode .btn-clear-filters:hover {
+    background: #4d4d4d;
+}
+
+/* Logo Styles */
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 0.5rem;
+}
+
+.site-logo {
+    height: 40px; /* Adjust based on your logo */
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    transition: color 0.3s;
+}
+
+/* Logo hover effects */
+.logo-link:hover .site-logo {
+    transform: scale(1.05);
+}
+
+.logo-link:hover .logo-text {
+    color: #3498db;
+}
+
+/* Dark mode logo adjustments */
+.dark-mode .logo-text {
+    color: #f0f0f0;
+}
+
+.dark-mode .logo-link:hover .logo-text {
+    color: #4fc3f7;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+    .site-logo {
+        height: 35px;
+    }
+    .logo-text {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-logo {
+        height: 30px;
+    }
+    .logo-text {
+        font-size: 1.1rem;
+    }
+}
