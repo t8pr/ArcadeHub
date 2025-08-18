@@ -3,112 +3,300 @@
 {% block title %}{{ game.title }}{% endblock %}
 
 {% block content %}
-    <!-- Inside your <main> tag -->
-    <main class="container">
-        <div class="game-details-container">
-            <!-- Developer Section -->
-            <div class="detail-section">
-                <h2 class="section-title">
-                    <i class="fas fa-user-tie"></i> معلومات المطور
-                </h2>
-                <div class="developer-card">
-                    <div class="developer-avatar">
-                        <i class="fas fa-user-circle fa-3x"></i>
-                    </div>
-                    <div class="developer-info">
-                        <h3>{{ game.developer }}</h3>
-                        <p class="developer-account">{{ game.developer_account }}</p>
-                        <div class="developer-stats">
-                            <span><i class="fas fa-gamepad"></i> 5 ألعاب</span>
-                            <span><i class="fas fa-star"></i> 4.3 تقييم</span>
-                        </div>
-                    </div>
+<main class="container">
+    <!-- Game Header Section -->
+    <div class="game-header-section">
+        <div class="game-header-content">
+            <h1 class="game-title">{{ game.title }}</h1>
+            <div class="game-meta">
+                <span class="game-developer"><i class="fas fa-user-tie"></i> {{ game.developer }}</span>
+                <div class="game-rating">
+                    {% for i in range(5) %}
+                        <i class="fas fa-star{% if i >= game.rating %}-half-alt{% endif %}"></i>
+                    {% endfor %}
+                    <span>{{ game.rating }}/5</span>
                 </div>
             </div>
+        </div>
+        <div class="game-header-actions">
+            <button class="btn btn-download-main">
+                <i class="fas fa-download"></i> تحميل اللعبة
+            </button>
+            <button class="btn btn-download-secondary">
+                <i class="fas fa-download"></i> النسخة التجريبية
+            </button>
+        </div>
+    </div>
 
-            <!-- Game Main Info -->
-            <div class="detail-section game-main-content">
-                <div class="game-header">
-                    <div class="game-poster">
-                        <img src="{{ game.thumbnail }}" alt="{{ game.title }}">
-                    </div>
-                    <div class="game-meta">
-                        <h1 class="game-title">{{ game.title }}</h1>
-                        
-                        <div class="rating">
-                            {% for i in range(5) %}
-                                {% if i < game.rating|int %}
-                                    <i class="fas fa-star"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                            <span>{{ game.rating }}</span>
-                            <span class="downloads"><i class="fas fa-download"></i> {{ game.downloads }} تنزيل</span>
-                        </div>
-                        
-                        <p class="game-description">{{ game.description }}</p>
-                        
-                        <div class="game-specs-grid">
-                            <div class="game-spec">
-                                <div class="spec-label">تاريخ الإصدار</div>
-                                <div class="spec-value">{{ game.release_date }}</div>
-                            </div>
-                            <div class="game-spec">
-                                <div class="spec-label">حجم اللعبة</div>
-                                <div class="spec-value">{{ game.size }}</div>
-                            </div>
-                            <div class="game-spec">
-                                <div class="spec-label">الإصدار</div>
-                                <div class="spec-value">{{ game.version }}</div>
-                            </div>
-                            <div class="game-spec">
-                                <div class="spec-label">النوع</div>
-                                <div class="spec-value">رعب/مغامرة</div>
-                            </div>
-                        </div>
-                        
-                        <div class="game-actions">
-                            <button class="btn btn-download">
-                                <i class="fas fa-download"></i> تنزيل اللعبة
-                            </button>
-                            <div class="price">
-                                {% if game.price > 0 %}
-                                    <span>{{ game.price }} ر.س</span>
-                                {% else %}
-                                    <span class="free-badge">مجاني</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Game Video -->
-                <div class="video-container">
-                    <iframe width="100%" 
-                            height="500" 
-                            src="{{ game.video_url }}?rel=0&modestbranding=1" 
+    <!-- Main Content Grid -->
+    <div class="game-content-grid">
+        <!-- Left Column -->
+        <div class="game-left-column">
+            <!-- YouTube Video Section -->
+            <div class="game-video-section">
+                <h2 class="section-title">
+                    <i class="fab fa-youtube"></i> عرض اللعبة
+                </h2>
+                <div class="video-embed-container">
+                    <iframe src="https://www.youtube.com/embed/{{ game.youtube_id }}?rel=0&modestbranding=1" 
                             frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                     </iframe>
                 </div>
-                
-                <!-- Screenshots -->
-                <div class="screenshots-section">
+            </div>
+
+            <!-- Game Description -->
+            <div class="game-description-section">
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i> وصف اللعبة
+                </h2>
+                <div class="description-content">
+                    {{ game.description }}
+                </div>
+            </div>
+
+            <!-- Game Features -->
+            <div class="game-features-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list-ul"></i> خصائص اللعبة
+                </h2>
+                <ul class="features-list">
+                    {% for feature in game.features %}
+                    <li><i class="fas fa-check-circle"></i> {{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="game-right-column">
+            <!-- Developer Info Box -->
+            <div class="developer-card-enhanced">
+                <div class="developer-header">
                     <h2 class="section-title">
-                        <i class="fas fa-images"></i> لقطات من اللعبة
+                        <i class="fas fa-user-tie"></i> حساب المطور
                     </h2>
-                    <div class="screenshots-grid">
-                        {% for image in game.images %}
-                        <div class="screenshot">
-                            <img src="{{ image }}" alt="لقطة {{ loop.index }} من {{ game.title }}">
+                    {% if game.get('developer_verified') %}
+                    <div class="developer-badge">
+                        <i class="fas fa-check-circle"></i> معتمد
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="developer-profile">
+                    <div class="developer-avatar-container">
+                        <img src="{{ game.get('developer_avatar', url_for('static', filename='images/default-avatar.png')) }}" 
+                            alt="{{ game.get('developer', 'مطور') }}" 
+                            class="developer-avatar">
+                        <div class="developer-status {{ 'online' if game.get('developer_online') else 'offline' }}"></div>
+                    </div>
+                    
+                    <div class="developer-info">
+                        <h3 class="developer-name">{{ game.get('developer', 'مطور غير معروف') }}</h3>
+                        {% if game.get('developer_bio') %}
+                        <p class="developer-bio">{{ game.get('developer_bio') }}</p>
+                        {% endif %}
+                        
+                        <div class="developer-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">{{ game.get('developer_games_count', 0) }}+</div>
+                                <div class="stat-label">ألعاب</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">
+                                    {% if game.get('developer_rating') %}
+                                        {{ "%.1f"|format(game.get('developer_rating')) }}/5
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </div>
+                                <div class="stat-label">تقييم</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">
+                                    {% if game.get('developer_downloads') %}
+                                        {{ "{:,}".format(game.get('developer_downloads')) }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </div>
+                                <div class="stat-label">تحميل</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="developer-actions">
+                    <button class="btn btn-follow">
+                        <i class="fas fa-user-plus"></i> متابعة
+                    </button>
+                    {% if game.get('developer_id') %}
+                    <a href="{{ url_for('developer_profile', dev_id=game.get('developer_id')) }}" class="btn btn-view-profile">
+                        <i class="fas fa-portrait"></i> عرض الحساب
+                    </a>
+                    {% endif %}
+                </div>
+                
+                {% if game.get('developer_games') %}
+                <div class="developer-latest">
+                    <h4 class="latest-title">
+                        <i class="fas fa-gamepad"></i> أحدث الألعاب
+                    </h4>
+                    <div class="latest-games">
+                        {% for dev_game in game.get('developer_games', [])[:2] %}
+                        <div class="game-item">
+                            <img src="{{ dev_game.get('thumbnail', url_for('static', filename='images/default-game.png')) }}" 
+                                alt="{{ dev_game.get('title', 'لعبة') }}" 
+                                class="game-thumb">
+                            <span class="game-name">{{ dev_game.get('title', 'لعبة')[:15] }}{% if dev_game.get('title', '')|length > 15 %}...{% endif %}</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
+                {% endif %}
+            </div>
+
+            <!-- Game Specs -->
+            <div class="game-specs-card">
+                <h2 class="section-title">
+                    <i class="fas fa-cog"></i> المواصفات
+                </h2>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-microchip"></i> النظام
+                        </div>
+                        <div class="spec-value">{{ game.platform|join(', ') }}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-database"></i> الحجم
+                        </div>
+                        <div class="spec-value">{{ game.size }}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-calendar-alt"></i> تاريخ الإصدار
+                        </div>
+                        <div class="spec-value">{{ game.release_date }}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-code-branch"></i> الإصدار
+                        </div>
+                        <div class="spec-value">{{ game.version }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screenshots -->
+            <div class="screenshots-card">
+                <h2 class="section-title">
+                    <i class="fas fa-images"></i> لقطات الشاشة
+                </h2>
+                <div class="screenshots-grid">
+                    {% for image in game.images[:4] %}
+                    <div class="screenshot-item">
+                        <img src="{{ image }}" alt="لقطة شاشة {{ loop.index }}">
+                        <div class="screenshot-overlay">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <h2 class="section-title-main">
+            <i class="fas fa-star"></i> تقييمات اللاعبين
+        </h2>
+        
+        <div class="reviews-container">
+            <!-- Review Form -->
+            <div class="review-form-card">
+                <h3 class="review-form-title">أضف تقييمك</h3>
+                <div class="rating-input">
+                    {% for i in range(1, 6) %}
+                    <i class="far fa-star" data-rating="{{ i }}"></i>
+                    {% endfor %}
+                </div>
+                <textarea placeholder="شاركنا رأيك عن اللعبة..."></textarea>
+                <button class="btn btn-submit-review">
+                    <i class="fas fa-paper-plane"></i> نشر التقييم
+                </button>
+            </div>
+            
+            <!-- Reviews List -->
+            <div class="reviews-list">
+                {% for review in game.reviews %}
+                <div class="review-card">
+                    <div class="reviewer-info">
+                        <img src="{{ review.user_avatar or url_for('static', filename='images/default-avatar.png') }}" 
+                             alt="{{ review.user }}">
+                        <div class="reviewer-meta">
+                            <span class="reviewer-name">{{ review.user }}</span>
+                            <div class="review-rating">
+                                {% for i in range(5) %}
+                                    <i class="fas fa-star{% if i >= review.rating %}-half-alt{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <span class="review-date">{{ review.date }}</span>
+                    </div>
+                    <div class="review-text">
+                        {{ review.text }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Rating stars interaction
+    const stars = document.querySelectorAll('.rating-input .fa-star');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.getAttribute('data-rating');
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas');
+                } else {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        });
+    });
+    
+    // Screenshot lightbox
+    const screenshots = document.querySelectorAll('.screenshot-item');
+    screenshots.forEach(screenshot => {
+        screenshot.addEventListener('click', function() {
+            const imgSrc = this.querySelector('img').src;
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            lightbox.innerHTML = `
+                <div class="lightbox-content">
+                    <img src="${imgSrc}" alt="لقطة شاشة">
+                    <button class="lightbox-close"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            document.body.appendChild(lightbox);
+            
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox || e.target.closest('.lightbox-close')) {
+                    document.body.removeChild(lightbox);
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

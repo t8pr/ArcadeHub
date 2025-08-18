@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="account-container">
+    <div class="account-sidebar">
+        <div class="account-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <nav class="account-menu">
+            <a href="#" class="active"><i class="fas fa-user"></i> معلومات الحساب</a>
+            {% if current_user.is_developer %}
+                <a href="#"><i class="fas fa-gamepad"></i> ألعابي</a>
+                <a href="{{ url_for('upload') }}"><i class="fas fa-upload"></i> رفع لعبة جديدة</a>
+            {% endif %}
+            <a href="#"><i class="fas fa-cog"></i> الإعدادات</a>
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+        </nav>
+    </div>
+    
+    <div class="account-content">
+        <h1>مرحباً، {{ current_user.username }}</h1>
+        <!-- Account content here -->
+    </div>
+</div>
+{% endblock %}
