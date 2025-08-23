@@ -423,8 +423,7 @@ def send_otp_email(email, otp_code, username):
     
     # If no email credentials are set, use fallback
     if not email_user or not email_password:
-        print(f"📧 EMAIL CREDENTIALS NOT SET - OTP for {email}: {otp_code}")
-        flash(f'في وضع التطوير: رمز التحقق هو {otp_code}', 'info')
+        flash(f'في وضع التطوير', 'info')
         return True
     
     try:
@@ -441,7 +440,7 @@ def send_otp_email(email, otp_code, username):
         msg['Subject'] = Header(subject, 'utf-8')
         
         # Set from and to with proper encoding
-        msg['From'] = Header(f"منصة سعودي أركيد <{email_user}>", 'utf-8')
+        msg['From'] = Header("SaudiArcade", 'utf-8')
         msg['To'] = Header(email, 'utf-8')
         
         # Create email body with Arabic text
