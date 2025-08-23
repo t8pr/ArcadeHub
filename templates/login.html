@@ -8,10 +8,18 @@
             <p>مرحباً بعودتك! يرجى إدخال بيانات حسابك</p>
         </div>
         
-        <form class="auth-form">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('login') }}" class="auth-form">
             <!-- Email Field -->
             <div class="form-group">
-                <label for="email">البريد الإلكتروني</label>
+                <label for="email">البريد الإلكتروني:</label>
                 <div class="input-with-icon">
                     <input type="email" id="email" name="email" required placeholder="example@example.com">
                     <i class="fas fa-envelope icon"></i>
@@ -20,39 +28,29 @@
 
             <!-- Password Field -->
             <div class="form-group">
-                <label for="password">كلمة المرور</label>
+                <label for="password">كلمة المرور:</label>
                 <div class="input-with-icon">
                     <input type="password" id="password" name="password" required placeholder="أدخل كلمة المرور">
-                    <i class="fas fa-lock icon"></i>
-                    <i class="fas fa-eye password-toggle"></i>
-                </div>
-                <div class="form-options">
-                    <div class="remember-me">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember">تذكرني</label>
-                    </div>
-                    <a href="#" class="forgot-password" onclick="alert('ستكون هذه الوظيفة متاحة قريباً'); return false;">نسيت كلمة المرور؟</a>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('password')"></i>
                 </div>
             </div>
 
-            <button type="button" class="btn btn-primary btn-login" onclick="alert('ستكون هذه الوظيفة متاحة قريباً');">
+            <!-- Forgot Password Link -->
+            <div class="forgot-password-container">
+                <a href="{{ url_for('forgot_password') }}" class="forgot-password-link">
+                    <i class="fas fa-key"></i> نسيت كلمة المرور؟
+                </a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-login">
                 <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
             </button>
-
-            <div class="auth-divider">
-                <span>أو</span>
-            </div>
-
-            <div class="social-login">
-                <p>سجل الدخول باستخدام:</p>
-                <div class="social-icons">
-                    <a href="#" class="social-btn google" onclick="alert('ستكون هذه الوظيفة متاحة قريباً'); return false;"><i class="fab fa-google"></i></a>
-                    <a href="#" class="social-btn twitter" onclick="alert('ستكون هذه الوظيفة متاحة قريباً'); return false;"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-btn github" onclick="alert('ستكون هذه الوظيفة متاحة قريباً'); return false;"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
         </form>
-        
+
+        <div class="auth-divider">
+            <span>أو</span>
+        </div>
+
         <div class="auth-footer">
             <p>ليس لديك حساب؟ <a href="{{ url_for('register') }}">إنشاء حساب جديد</a></p>
         </div>
@@ -60,16 +58,323 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Password toggle functionality
-    const passwordToggle = document.querySelector('.password-toggle');
-    const passwordInput = document.getElementById('password');
+function togglePassword(fieldId) {
+    const input = document.getElementById(fieldId);
+    const icon = input.parentElement.querySelector('.password-toggle');
     
-    passwordToggle.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye-slash');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// Enter key to submit form
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.auth-form');
+    form.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            form.submit();
+        }
     });
 });
 </script>
+
+<style>
+/* Responsive Login Styles */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+}
+
+.auth-card {
+    background: #2d2d2d;
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid #3a3a3a;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    color: #f0f0f0;
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.auth-header p {
+    color: #b0b0b0;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: #f0f0f0;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 1px solid #444;
+    border-radius: 10px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.input-with-icon input:focus {
+    border-color: #2EC630;
+    box-shadow: 0 0 0 3px rgba(46, 198, 48, 0.2);
+    outline: none;
+}
+
+.input-with-icon .icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8f8f8f;
+    font-size: 1.1rem;
+}
+
+.password-toggle {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #8f8f8f;
+    z-index: 2;
+    font-size: 1.1rem;
+}
+
+.password-toggle:hover {
+    color: #2EC630;
+}
+
+/* Forgot Password Link */
+.forgot-password-container {
+    text-align: left;
+    margin: -0.5rem 0 1rem 0;
+}
+
+.forgot-password-link {
+    color: #2EC630;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s;
+}
+
+.forgot-password-link:hover {
+    color: #25a328;
+    text-decoration: underline;
+}
+
+/* Login Button */
+.btn-login {
+    background: #2EC630;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+}
+
+.btn-login:hover {
+    background: #25a328;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 198, 48, 0.3);
+}
+
+/* Divider */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: #8f8f8f;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #444;
+}
+
+.auth-divider span {
+    padding: 0 1rem;
+    font-size: 0.9rem;
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #b0b0b0;
+}
+
+.auth-footer a {
+    color: #2EC630;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid transparent;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 0.5rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+    
+    .auth-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+        border-radius: 12px;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .auth-header p {
+        font-size: 0.9rem;
+    }
+    
+    .input-with-icon input {
+        padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+        font-size: 0.95rem;
+    }
+    
+    .btn-login {
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+    
+    .forgot-password-link {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .input-with-icon input {
+        padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    }
+    
+    .input-with-icon .icon,
+    .password-toggle {
+        font-size: 1rem;
+    }
+    
+    .btn-login {
+        padding: 0.8rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Focus states for accessibility */
+.input-with-icon input:focus {
+    transform: scale(1.02);
+}
+
+.btn-login:focus {
+    outline: 3px solid rgba(46, 198, 48, 0.4);
+    outline-offset: 2px;
+}
+
+.forgot-password-link:focus {
+    outline: 2px solid #2EC630;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+</style>
 {% endblock %}

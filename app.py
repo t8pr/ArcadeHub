@@ -1,166 +1,696 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import supabase
-import humanize  
+from flask_mail import Mail, Message
+from supabase import create_client, Client
+import os
+import re
+from dotenv import load_dotenv
+from Games import GAMES 
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid  # ← ADD THIS LINE
+from urllib.parse import urlparse, urljoin
+import random
+import datetime
+from datetime import datetime, timezone, timedelta
+# Load environment variables
+load_dotenv()
+
 app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'fallback-secret-key')
 
-# Initialize Supabase client (replace with your credentials)
-app.secret_key = 'PLATFORMAPPSECRETKEY123321'  # Required for session management
-supabase_url = "https://your-project.supabase.co"
-supabase_key = "your-supabase-key"
-supabase_client = supabase.create_client(supabase_url, supabase_key)
+# Initialize Supabase
+supabase_url = os.getenv('SUPABASE_URL')
+supabase_key = os.getenv('SUPABASE_KEY')
+supabase_client: Client = create_client(supabase_url, supabase_key)
+
+# Flask-Login setup
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# After app initialization
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
+mail = Mail(app)
+# After app initialization
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
+mail = Mail(app)
+# After supabase_client initialization, add:
+try:
+    supabase_url = os.getenv('SUPABASE_URL')
+    supabase_key = os.getenv('SUPABASE_KEY')  # Should be service_role key
+    
+    if not supabase_url or not supabase_key:
+        raise ValueError("Supabase URL or key missing from .env file")
+    
+    supabase_client: Client = create_client(supabase_url, supabase_key)
+    print("✅ Supabase client initialized successfully")
+    
+except Exception as e:
+    print(f"❌ Failed to initialize Supabase: {e}")
+    supabase_client = None
+
+class User(UserMixin):
+    def __init__(self, id, email, username, account_type, created_at=None):
+        self.id = id
+        self.email = email
+        self.username = username
+        self.account_type = account_type
+        self.created_at = created_at
+
+    def is_developer(self):
+        return self.account_type == 'developer'
+
+@login_manager.user_loader
+def load_user(user_id):
+    if not supabase_client:
+        return None
+        
+    try:
+        response = supabase_client.table('users').select('id, email, username, account_type, created_at').eq('id', user_id).execute()        
+        if response.data:
+            user_data = response.data[0]
+            return User(
+                id=user_data['id'],
+                email=user_data['email'],
+                username=user_data['username'],
+                account_type=user_data['account_type'],
+                created_at=user_data.get('created_at')  # Add this line
+            )
+    except Exception as e:
+        print(f"Error loading user: {e}")
+    return None
 
 
-GAMES = [
-    {
-        "slug": "abandoned-riyadh",
-        "title": "مهجول الرياض",
-        "developer": "استوديو الأفق",
-        "developer_account": "@AlUfuqStudio",
-        "description": "لعبة رعب بقصص عربية حيث تستكشف مباني الرياض المهجورة وتكشف أسرارها المظلمة. انتبه للأصوات الغريبة ولا تدع الظلام يلحق بك!",
-        "price": 49.99,
-        "rating": 4.7,
-        "downloads": "1,245",
-        "release_date": "15 يناير 2023",
-        "size": "2.4 جيجابايت",
-        "version": "1.2.0",
-        "video_url": "https://www.youtube.com/embed/v35NNDsBehQ",
-        'developer': 'Abo7aman',
-        'developer_avatar': 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEBUTEBAQEhAQDQ8QERESEhYPDw8QFRMWFhUSFxUYHCggJBolGxMTIT0hJykrLzouFx8zRDMtNyguOisBCgoKDg0OGhAQGDcdHx8tLS0tLS0tKy0tLS0tLS0tLSstLS0rLS0tLSstLS0tKy0rLS0tLS0tLS0tLS0tLSstLf/AABEIAOMA3gMBEQACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAABAUCAwYBBwj/xABEEAACAQECCAgLCAEEAwAAAAAAAQIDBBEFBhIhMUFRcRMyYXKBkqGxFyIzUlRikZPB0uEHFBYjQnOy0YJDoqPxJDRT/8QAGgEBAAMBAQEAAAAAAAAAAAAAAAECBAUDBv/EACwRAQACAQIEBQQCAwEAAAAAAAABAhEDBBMhMVEFFDNBcRIyUoEiYZGh4SP/2gAMAwEAAhEDEQA/APuIAAAAAAAAAAbAhV8IwjmXjPk0e0jKcIVXCVR6Lo7le+0jK2EaVeb0yk+lhOHlN51vQJTkyzzZxqyX6n3gbYWxrSk+xgSadeMtefYwNoAAAAAAAAAAAAAAAAAAAANVorxgr5PctbBEZU1qtcqmnNHzVo6SuV4hHCQABlT0regSnFnmAAAEihaWszzrtQE2LTzoD0AAAAAAAAAAAAAAAAA116yhFyertewChr1nOV76FqS2FV4hrCQAAAyp6VvQJTizzAAAABus9bJefQ9PJygWCYAAAAAAAAAAAAAAADCdWK0tLe0gKTCVujOVynHJjm4yzvWysyvWETho+dHrIjMLYOGj50eshmDBw0fOj1kMwYOGj50eshmDBw0fOj1kMwYe060b140dK/UhlEwncNDz49ZF8qYk4aHnx6yIMScNDz49ZAxJw0PPj1kDEnDQ8+PWQMScNDz49ZAxKZY7ZC65zjm0eMtBJiU2Mk86aa2rOgh6AAAAAAAAAAAAAD83faBw7wjX+9X5arT4PL4qoX/l5F/6cm7Rrv13mW+c83S0cfRH0ueuj6vYVehdH1ewBdH1ewBdH1ewBdH1ewBdH1ewD1KPq9gObO6Hq9gSXQ9XsBkuh6vYORkuh6vYDJdD1ewcjJdD1ewGXl0PV7ByMvpv2Iuvw9ZRyvunA+Pp4NV8qORdqysnLvu1Xch66XVk3P04ju+xHuxgAAAAAAAAAAAAfP8AHDH+w0ars8qdStUpSuqOEIShCWuF85LPn1bDzteOjRp6NpjOcOd8Idg9Er+7o/OU4kdnpwbdzwh2D0Sv7uj844kdjg27nhDsHolf3dH5xxI7HBt3PCHYPRK/u6PzjiR2ODbueEOweiV/d0fnHEjscG3c8Idg9Er+7o/OOJHY4Nu7KH2iWC9f+JX0r/To/OOJHY4Fu6T4SsH+iWj3dD5yeJXsr5e/5HhKwf6JaPd0PnHEr2PL3/I8JWD/AES0e7ofOOJXseXv+R4SsH+iWj3dD5xxK9jy9/yPCVg/0S0e7ofOOJXseXv+R4SsH+iWj3dD5xxK9jy9/wAjwlYP9EtHu6HzjiV7Hl7/AJOxxOxuslvi4UFOnOlFOVKpGMJZLd2WsltNX8uvlL1tFujy1NK1Orpi7yAAAAAAAAAAAAA+L44fZzavvdSpQlSnSr1alZKc3CcJTllSi81zV7dzvPC2nOeTbp69fpiJUng9whso+9+hXh2X49Gm14jW2lHKmqOSmlmqXu99B56n8K5svp3jUtiqD+G7Rsh1/oeHmtNo4Nz8N2jZDr/Qea0zg3Pw3aNkOv8AQea0zg3Pw3aNkOv9B5rTODcWLdo2Q6/0HmtM4N238MWnZT6/0I83pnCsfhm07KfX+g83pnCsfhm07KfX+g83pnCsfhm07KfX+g83pnCs9WLFp2U+v9BG605k4Vlr4N8I+bQ979DZw7MnmKHg3wj5tD3v0J4dkeYo7f7M8SK1iqztFolDLlSdKEKcnJKLknKUncs98FmRelJjnLw1taLxiH0U9WcAAAAAAAAAAAACpwzxo8195ErVV5Cymxol+VFbaq7Iswb+cUj5bdhGby5k5TqgAAB7HSt6IEgqAAAAYQ+hUJXwi9sIv2o+npOaxL5y8YtLYWVT7HxelgbwAAAAAAAAAAAAAVGGOOuZ8WRK1UAhZRY1PxafOl3I53iH21dDw/7rOdOY6QAAAew0reiBIKgAAAAO+sDvpU/2ofxR9Lo+nX4fO6v32+Ug9HmnWLi9LAkAAAAAAAAAAAAAApsLv8xcxd7KytVCCyhxqXi0+dPuRzvEOlXQ2HWznjlukEgAA9hpW9ECQVAAAABDvcHeRp/tQ/ij6TQ9Ovw+f1vUt8pJ6vJNsPFfO+CAkgAAAAAAAAAAAAApcKv8z/FfErK8IYSpcaI/lxeyp3xf9GDfx/CJbthP85c0cp1AAAA9hpW9ECQVAAAAMD6BZI3U4LZTgv8Aaj6bTjFIj+nzmpObzLcXUTLBoe8CUAAAAAAAAAAAAACjwo/zXuj3FZXjoihKuw/TyqEvVcZex5+xsy7yudKf6adpbGrDkTiuyAAAHsdK3ogSCoAAAGVOGU0tskva7i1YzMQracRMvoaVx9NEYh85PV6ShLsGh70BLAAAAAAAAAAAAABRYS8rLo7kVleOiMEtNsoupTnBO5zpzipea2mk+h5ytqxMYlatpi0TD5JgPGaNWXBWhKlaIycGnmhKadzS2O/UcfW2s0515w7WnrRbq6IyvdEwlhClZ4ZdWVy0JaZSexLWy9NO15xClrRWMy4zCGO1aTfAwhTjqcllz/pbrmbqbSsdebPbXmeiJDD2EpZ1Oq1pvVGLXZAvwdLt/v8A6rxLttnxytsH4041LnnjOml0eLcys7XTn2OLeHW4AxqpWpqElwVZ6It3xnzZbeR9pk1ttanOOcPemrFuroDK9UXCOEKVnhl1pqEdV/Gk9kVpbL007XnFYVtaK9VNitjBVt+FLPSpRdOhGo6tTXUnClFz8Z6ouSirlt0nU2+0rWczzlh3OtP0Th9pOk5IBLsGvo+IEsAAAAAAAAAAAAAFBb3+bLeu5FZXjo0BIB8F+0/BH3bCNRpXU7SvvEM2bKl5RddN/wCSPG8Yls0pzVpxfxsnRuhXvqUtClpqU18V2mPV20X515S101prylWYZwjUtle+5tOWRRhsTdyW9nrp0jTrj/Kl7TeXb4AxbpWeKlOMZ17r3Jq9QeyCffpMGtuJvOI5Q000or1X0XnW9GZ6tOFcEULTHJqwTd2aazVIPapfDQX09a+nPKVLUiXy7DODZ2Ss6cnnjdKE1myo/pktjze1HV09SL1zDHev0zh0UceZxs8YqGVaEnGVSXk82idyztvZmRmnaVm+fbs9uNOP7crbLZUrTc6s5Tm9b1LYloS5EaqxFYxHJ4TMz1fUvsLwRnr2uS1KzUn7J1Gv+NdDNGlHuybm3SH1s9mQAlWDS9yAmAAAAAAAAAAAAAA5+2+UlzmVleGkJAOL+1XAX3qxcLCN9WyN1VdplSa/Nj7Epf4FLRmHrpWxL4aeDYusToxdsp5TSuy3G/XPJdy36+g8txnhzh6aWPrh9NOS2o1owhRpSjGpVhCU2lFSlc39OUvXTtaMxGVZvEdZWR5LOK+0qELqLvXCX1FdrcHc79ya7Wb9lnEs+v7OGNrO3WSyzrVI06UXKpUnGEIrTKUnckTEZlEzjnL9N4tYHhYbJSs8LnwVNKUtGXUeec+mTbNdYxGHMvb6rZWZKoBJsOl7gJoAAAAAAAAAAAAAOetT8eXPl3lV4agkA8a26APz/jxi47HaqvBq+z8JfBr/AE1JKWQ+RX3J7jJN6zea+8OhSJmkWc3FtO9Npp3prM01rJSuI4021RyeG1XZTjFz9tx5ToacznD04tsdVTUqSlJyk3KUne5N3tvlbPX2w81hYsO2qjHJpV5xgtEc0lHdlJ3dB5206WnNoXi9ojlKHarTOrJzqTlOb0yk73u3cheIiIxCszM9WtK93LO27klnbexAfW/sexXVOrO0V4rhoQiqUNPBZeUpSfrXK7kTe3Nbb3re0xHs8N3Fq1j+31g1sAAAkWHjPm/ECcAAAAAAAAAAAAADnK78eXPl3lXpDAAAA4DGRJ2mqmk02k086ayVmuOJuZmNaXZ20f8AlDh8LYqKV8rO1F66cuK+a9W7RuPXT3XtdN9H3hy9rslSk7qkJQfKsz3PQ+g11tFozE5Z5rMdWklD0JWODMCV7RxINQ/+k/Fh0beg876tKdZWrS1na4FwBSs3jcerdnqSWjmrV3mDV17X5dIaaacVfQMRNNbdS75mvw7rb9MPiPSrrjqOYAAN9i43+LAngAAAAAAAAAAAAA5uo875z7yr0YgAAHAYwf8AtVeev4o4e59Wztbf0qq88HuxqQUldJKSepq9exkxMx0RMZV1TF6ySeejFZ/0uUF7ItHrG41I91J06z7JdlwLZqbvhRhetDd85LpleVtr6k9ZTFKx7LA8lwDqMRONV5tPvkdHw7rZzvEOlXXnVcsAAbrHx+hgWAAAAAAAAAAAAAAOZfxKvQAAAODxioSjaJyaeTKd8XqeY4u6paNSZmOrsbW9Z04iJ6KwzNIAjp6QJBAACB1mI9GS4STTUZRgot67m9B1fD6WjNpjlLl+IXrOIiecOrOk5wAA3WTjrp7gLAAAAAAAAAAAj2i206fHmk9mmXsWcCBWw/TXFjKX+1EJwhVsP1HxYxj7ZMZThrhK9J7UQsyAAAKu104yclJJpt3p50VtWLRiYTW01nMS5634Caz0c68xvOtzOdrbKY50dDR3sTyuppRadzTTWlPM0YJiY5S3xMTGYeR09JCUggZ0aMpvJhFyk9SJrS15xWMq2vWsZtOHRYNwBGN0q10peZ+hb9vcdXQ2MV53cvX3s25UdLYNL3I6HRg6poAABrrV3BXx035gPaeGZfqgnudwEqnham9OVHer12ATKVWMlfFprkd4GYAAAAAc/hTDLbcaTuWhz1vm8nKQtEKVu/TpIS8AATrHK+N2xhLeAAAVtbjPnMIYARrZYadVeOs+qSzSXSeWroU1I5w9tPWvp9JcxhCx8DUyb8rMpJ3XZm/ocfX0uFbGcuto6vEr9WMLHA+CeHvk5ZMIyud3Gbuv3az02214vOZ5PLc7nhcojm6ey2SFJXQikte172dfT0q6cYrDk6mrbUnNpbj0eaVYNL3ICaAAAQrdLOlsV/tAigAM6dRxd8W09qAu8HYQ4TxZZp9kvqBPAAAKjGC2ZMVCL8aaz8kPr/ZCYhzZCwAAASLHLxrtq7glNAAAK2txnzn3hDAABzWMXl1+3HvZyN96n6dbY+n+11it5KX7r/ijV4f9k/LLv/vj4XJvYACVYNL3fECaAAAVdaV8m+UDAAAA9jJp3rM0709jA6WxWjhIKWvQ96A3gAORwxVyq09ieSujN33kLx0QiAAAAMqcrmnsYFmEgACsq8Z733hDEABzWMXl1+3HvZyN96n6dbY+n+11it5KX7r/AIo1eH/ZPyy7/wC+Phcm9gAJVg0vm/ECaAA115XRb5O0CsAAAAAC1wFUzyjyKS6Mz70BcAYzlcm3oSb9gHETle23pbb9pC7EgAAAABvs9oycz0dwSmpgegVlTS977whiAA5rGLy6/bj3s5G+9T9OtsfT/a6xW8lL91/xRq8P+yfll3/3x8Lk3sABJsPGfN+IE4DCpUUVe/8AsCvrVXJ59GpbANYAAAAATMFTuqx5b4+1AdCBDwvUyaE3tjk9Z3fEEOQKrgAAAAAAN1Cu48q7glOi0860AVs9L3sIYgAOaxi8uv2497ORvvU/TrbL0/2usVvJS/df8Ymrw/05+WXxD74+Fyb2AAk2HjPm/FASq1VRWfTqW0CvqVHJ3v8A6AwAAAAAABnSnkyT2ST9jA6pAU+MtS6nGPnTv6Ev7aIlMOcIWAAAAAAAANlGs4vk1oJYSefpCHgACrwtgqVacZQavuUWpZk1fmd/SYt1trakxarZttzGnE1stcEWHgKeS3fJycpXaL8yuXsPfbaHCpiXhudbi3zCaaGcA20KuS2+S5AYTk273pAxAAAAAAAAAdNYZ5VOL9VLpWZ9wFFjJUvqRj5sO1v6IiVoVBCQAAAAAAAAAAAAMoaVvRJKYSoAAAAAAAAAAAAAAvcCzvptebJ+x5/7A5/CtTKrTfrZPVzfAheEQgAAAAAAAAAAAAAyhpW9EiYSoAAAAAAAAAAAAAAs8B1LpSW2Kfsf1AoJu9vlbKrsQAAAAAAAAAAAAAZQ0reiRMJUAAAAAAAAAAAAAAbKMmnmd2YD/9k=',  # optional
-        'developer_rating': 4.5,  # optional
-        'developer_downloads': 133,  # optional
-        'developer_games': [],  # optional list of games
-        "images": [
-            "https://mir-s3-cdn-cf.behance.net/projects/404/227867169167761.Y3JvcCw0MzE0LDMzNzUsMTY3Niww.png",
-            "https://pbs.twimg.com/media/ERzWOxUW4AAfImu.png",
-        ],
-        "thumbnail": "https://play-lh.googleusercontent.com/N4xrvxasKOCSVU_ZTrSGLEqFEX_6n5MaNUbzD2Tl3giTPJUa9pMyjeasHIXAeGtv9A"
-    },
-    {
-        "slug": "desert-rally",
-        "title": "سباق الصحراء",
-        "developer": "ألعاب الخليج",
-        "developer_account": "@GulfGames",
-        "description": "سباق سيارات سريع في صحراء الربع الخالي مع تحديات وعواصف رملية ومطاردة الشرطة. اختر سيارتك وكن الأسرع!",
-        "price": 29.99,
-        "rating": 4.3,
-        "downloads": "3,542",
-        "release_date": "5 مارس 2023",
-        "size": "1.8 جيجابايت",
-        "version": "1.5.2",
-        "video_url": "https://www.youtube.com/embed/mEiXt2C8_V4?si=o7ic4sS7HxlOJ4Pt",
-        "images": [
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLUTnLzsxItzyH25RVqFcRNSWUlROGC5Gc6w&s",
-        ],
-        "thumbnail": "https://images.stockcake.com/public/2/e/9/2e9185c6-70e5-4d16-9e0a-c616ffcba528_medium/pixelated-rally-action-stockcake.jpg"
-    },
-    {
-        "slug": "arabian-nights",
-        "title": "ليالي عربية",
-        "developer": "استوديو ألف ليلة",
-        "developer_account": "@1001NightsDev",
-        "description": "مغامرة غامضة في عالم ألف ليلة وليلة حيث تحل الألغاز وتقاتل المخلوقات الأسطورية وتكتشف كنوزًا قديمة.",
-        "price": 39.99,
-        "rating": 4.8,
-        "downloads": "2,876",
-        "release_date": "22 نوفمبر 2022",
-        "size": "3.1 جيجابايت",
-        "version": "2.0.1",
-        "video_url": "https://www.youtube.com/embed/7B7Y8VLvW8E",
-        "images": [
-            "https://i.pinimg.com/originals/8a/1b/6d/8a1b6d8e3c7b8e3a3e3b3e3e3e3e3e3e.jpg",
-            "https://i.pinimg.com/originals/8a/1b/6d/8a1b6d8e3c7b8e3a3e3b3e3e3e3e3e3e.jpg"
-        ],
-        "thumbnail": "https://i.pinimg.com/originals/8a/1b/6d/8a1b6d8e3c7b8e3a3e3b3e3e3e3e3e3e.jpg"
-    },
-    {
-        "slug": "mecca-pilgrim",
-        "title": "حاج مكة",
-        "developer": "ألعاب إسلامية",
-        "developer_account": "@IslamicGames",
-        "description": "محاكاة واقعية لرحلة الحج من بدايتها حتى نهايتها مع تفاعل كامل مع البيئة والمشاعر والأدعية.",
-        "price": 0.00,
-        "rating": 4.9,
-        "downloads": "15,342",
-        "release_date": "1 ذو الحجة 1443",
-        "size": "1.2 جيجابايت",
-        "version": "1.0.0",
-        "video_url": "https://www.youtube.com/embed/5BZ3sO7cdz4",
-        "images": [
-            "https://www.islamic-relief.org/wp-content/uploads/2020/07/Hajj-2020.jpg",
-            "https://www.islamic-relief.org/wp-content/uploads/2020/07/Hajj-2020-2.jpg"
-        ],
-        "thumbnail": "https://www.islamic-relief.org/wp-content/uploads/2020/07/Hajj-2020.jpg"
-    },
-    {
-        "slug": "bedouin-survival",
-        "title": "بقاء البدو",
-        "developer": "ألعاب الصحراء",
-        "developer_account": "@DesertSurvival",
-        "description": "لعبة بقاء في الصحراء العربية حيث يجب عليك إيجاد الماء والطعام وبناء مأوى والدفاع عن نفسك من الحيوانات المفترسة.",
-        "price": 19.99,
-        "rating": 4.2,
-        "downloads": "4,231",
-        "release_date": "10 يونيو 2023",
-        "size": "2.7 جيجابايت",
-        "version": "1.3.4",
-        "video_url": "https://www.youtube.com/embed/9zG_DlxykDk",
-        "images": [
-            "https://i.ytimg.com/vi/9zG_DlxykDk/maxresdefault.jpg",
-            "https://i.ytimg.com/vi/9zG_DlxykDk/hqdefault.jpg"
-        ],
-        "thumbnail": "https://i.ytimg.com/vi/9zG_DlxykDk/maxresdefault.jpg"
-    },
-    {
-        "slug": "arabic-chef",
-        "title": "الشيف العربي",
-        "developer": "ألعاب الطهي",
-        "developer_account": "@ArabicCooking",
-        "description": "اصبح شيفًا محترفًا وتعلم طبخ أشهر الأكلات العربية من المقلوبة إلى الكبسة إلى الحلويات الشرقية.",
-        "price": 14.99,
-        "rating": 4.0,
-        "downloads": "7,654",
-        "release_date": "5 مايو 2023",
-        "size": "1.5 جيجابايت",
-        "version": "1.1.2",
-        "video_url": "https://www.youtube.com/embed/3jZ5q3q3q3q",
-        "images": [
-            "https://www.chefspencil.com/wp-content/uploads/Arabic-Food.jpg",
-            "https://www.chefspencil.com/wp-content/uploads/Arabic-Food-2.jpg"
-        ],
-        "thumbnail": "https://www.chefspencil.com/wp-content/uploads/Arabic-Food.jpg"
-    },
-    {
-        "slug": "dubai-simulator",
-        "title": "محاكي دبي",
-        "developer": "ألعاب الإمارات",
-        "developer_account": "@UAE_Games",
-        "description": "عش حياة الرفاهية في دبي حيث يمكنك قيادة السيارات الفاخرة والطيران بالمروحيات والتنقل بين ناطحات السحاب.",
-        "price": 59.99,
-        "rating": 4.5,
-        "downloads": "9,876",
-        "release_date": "2 ديسمبر 2023",
-        "size": "4.2 جيجابايت",
-        "version": "1.7.0",
-        "video_url": "https://www.youtube.com/embed/4jZ5q3q3q3q",
-        "images": [
-            "https://www.visitdubai.com/-/media/gathercontent/department/things-to-do/attractions/listing-image/burj-khalifa-1.jpg",
-            "https://www.visitdubai.com/-/media/gathercontent/department/things-to-do/attractions/listing-image/burj-khalifa-2.jpg"
-        ],
-        "thumbnail": "https://www.visitdubai.com/-/media/gathercontent/department/things-to-do/attractions/listing-image/burj-khalifa-1.jpg"
-    }
-]
+# ===== ROUTES =====
 
+@app.template_filter('format_date')
+def format_date_filter(value):
+    if isinstance(value, str):
+        try:
+            # Parse ISO format string
+            dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+            return dt.strftime('%Y-%m-%d %H:%M')
+        except:
+            return value
+    elif hasattr(value, 'strftime'):
+        # It's already a datetime object
+        return value.strftime('%Y-%m-%d %H:%M')
+    return value
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.template_filter('humanize')
-def humanize_filter(value):
-    return humanize.intcomma(value) if value else "0"
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if not supabase_client:
+        flash('❌ نظام التسجيل غير متاح حالياً', 'error')
+        return render_template('register.html')
+    
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        username = request.form['username'].strip()
+        password = request.form['password']
+        account_type = request.form.get('account_type', 'user')
+        
+        # Validation
+        errors = []
+        
+        # Email validation
+        if not email or '@' not in email or '.' not in email:
+            errors.append('صيغة البريد الإلكتروني غير صحيحة')
+        
+        # Username validation
+        if not username or len(username) < 3:
+            errors.append('اسم المستخدم يجب أن يكون 3 أحرف على الأقل')
+        elif len(username) > 20:
+            errors.append('اسم المستخدم يجب أن لا يتجاوز 20 حرف')
+        elif not username.isalnum():
+            errors.append('اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط')
+        
+        # Password validation
+        if len(password) < 8:
+            errors.append('كلمة المرور يجب أن تكون 8 أحرف على الأقل')
+        elif not any(char.isdigit() for char in password):
+            errors.append('كلمة المرور يجب أن تحتوي على رقم واحد على الأقل')
+        elif not any(char.isupper() for char in password):
+            errors.append('كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل')
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('register.html')
+        
+        try:
+            # Check if email already exists
+            email_check = supabase_client.table('users').select('email').eq('email', email).execute()
+            if email_check.data:
+                flash('البريد الإلكتروني مسجل مسبقاً', 'error')
+                return render_template('register.html')
+            
+            # Check if username already exists
+            username_check = supabase_client.table('users').select('username').eq('username', username).execute()
+            if username_check.data:
+                flash('اسم المستخدم مسجل مسبقاً', 'error')
+                return render_template('register.html')
+            
+            # Create user
+            hashed_password = generate_password_hash(password)
+            new_user = {
+                'email': email,
+                'username': username,
+                'password': hashed_password,
+                'account_type': account_type
+            }
+            
+            response = supabase_client.table('users').insert(new_user).execute()
+            
+            if response.data:
+                user_data = response.data[0]
+                user = User(
+                    id=user_data['id'],
+                    email=user_data['email'],
+                    username=user_data['username'],
+                    account_type=user_data['account_type']
+                )
+                login_user(user)
+                flash(f'تم إنشاء الحساب بنجاح! مرحباً {username}', 'success')
+                
+                # Redirect based on account type
+                if account_type == 'developer':
+                    flash('يمكنك الآن رفع الألعاب الخاصة بك', 'info')
+                    return redirect(url_for('upload'))
+                else:
+                    flash('يمكنك الآن استكشاف وتحميل الألعاب', 'info')
+                    return redirect(url_for('games'))
+            else:
+                flash('فشل في إنشاء الحساب', 'error')
+                
+        except Exception as e:
+            flash('حدث خطأ في إنشاء الحساب', 'error')
+            print(f"Registration error: {e}")
+            
+    return render_template('register.html')
+
+@app.route('/api/check-email/<email>')
+def check_email(email):
+    try:
+        response = supabase_client.table('users').select('email').eq('email', email).execute()
+        return {'available': len(response.data) == 0}
+    except:
+        return {'available': False}
+
+@app.route('/api/check-username/<username>')
+def check_username(username):
+    try:
+        response = supabase_client.table('users').select('username').eq('username', username).execute()
+        return {'available': len(response.data) == 0}
+    except:
+        return {'available': False}
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('يجب تسجيل الدخول للوصول إلى هذه الصفحة', 'error')
+    return redirect(url_for('login', next=request.endpoint))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('account'))
+    
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        try:
+            # Get user from Supabase
+            response = supabase_client.table('users').select('*').eq('email', email).execute()
+            
+            if response.data:
+                user_data = response.data[0]
+                
+                # Check password
+                if check_password_hash(user_data['password'], password):
+                    user = User(
+                        id=user_data['id'],
+                        email=user_data['email'],
+                        username=user_data['username'],
+                        account_type=user_data['account_type']
+                    )
+                    login_user(user)
+                    flash('تم تسجيل الدخول بنجاح!', 'success')
+                    
+                    # Redirect to intended page or account
+                    next_page = request.args.get('next')
+                    return redirect(next_page or url_for('account'))
+                else:
+                    flash('كلمة المرور غير صحيحة', 'error')
+            else:
+                flash('البريد الإلكتروني غير مسجل', 'error')
+                
+        except Exception as e:
+            flash('حدث خطأ أثناء تسجيل الدخول', 'error')
+            print(f"Login error: {e}")
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('تم تسجيل الخروج بنجاح', 'success')
+    return redirect(url_for('home'))
+
+@app.route('/account')
+@login_required
+def account():
+    return render_template('account.html', user=current_user)
+
+@app.route('/update-username', methods=['POST'])
+@login_required
+def update_username():
+    try:
+        # Get the username from form data
+        new_username = request.form.get('new_username', '').strip()
+        
+        if not new_username:
+            flash('لم يتم تقديم اسم مستخدم', 'error')
+            return redirect(url_for('account') + '#profile')
+        
+        # Validation
+        if len(new_username) < 3:
+            flash('اسم المستخدم يجب أن يكون 3 أحرف على الأقل', 'error')
+            return redirect(url_for('account') + '#profile')
+        
+        if len(new_username) > 20:
+            flash('اسم المستخدم يجب أن لا يتجاوز 20 حرف', 'error')
+            return redirect(url_for('account') + '#profile')
+        
+        if not re.match(r'^[a-zA-Z0-9\u0600-\u06FF]+$', new_username):
+            flash('اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط', 'error')
+            return redirect(url_for('account') + '#profile')
+        
+        # Check if username already exists (excluding current user)
+        existing_user = supabase_client.table('users').select('username').eq('username', new_username).neq('id', current_user.id).execute()
+        
+        if existing_user.data:
+            flash('اسم المستخدم مسجل مسبقاً', 'error')
+            return redirect(url_for('account') + '#profile')
+        
+        # Update username in database
+        update_response = supabase_client.table('users').update({
+            'username': new_username,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.username = new_username
+            flash('تم تحديث اسم المستخدم بنجاح', 'success')
+        else:
+            flash('فشل في تحديث اسم المستخدم', 'error')
+            
+    except Exception as e:
+        flash('حدث خطأ في تحديث اسم المستخدم', 'error')
+        print(f"Username update error: {e}")
+    
+    return redirect(url_for('account') + '#profile')
+
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    # Check if we have user data in session
+    if 'reset_user_id' not in session or 'reset_email' not in session:
+        flash('يرجى طلب إعادة تعيين كلمة المرور أولاً', 'error')
+        return redirect(url_for('forgot_password'))
+    
+    # Get the actual user data from session
+    user_id = session['reset_user_id']
+    user_email = session['reset_email']  # The actual account email
+    
+    if request.method == 'POST':
+        otp_code = request.form['otp_code'].strip()
+        
+        # Basic OTP validation
+        if not otp_code or len(otp_code) != 6 or not otp_code.isdigit():
+            flash('رمز التحقق يجب أن يكون 6 أرقام', 'error')
+            return render_template('verify_otp.html')
+        
+        try:
+            # Check OTP attempts
+            if session.get('otp_attempts', 0) >= 3:
+                flash('لقد تجاوزت عدد المحاولات المسموح بها', 'error')
+                session.clear()
+                return redirect(url_for('forgot_password'))
+            
+            # ✅ CRITICAL: Verify OTP for this specific user ID and email
+            response = supabase_client.table('password_resets').select('*').eq('user_id', user_id).eq('email', user_email).eq('otp_code', otp_code).eq('used', False).execute()
+            
+            if response.data:
+                otp_data = response.data[0]
+                
+                # Check if OTP is expired
+                expires_at = datetime.fromisoformat(otp_data['expires_at'].replace('Z', '+00:00')).replace(tzinfo=timezone.utc)
+                current_time = datetime.now(timezone.utc)
+                
+                if current_time > expires_at:
+                    flash('انتهت صلاحية رمز التحقق', 'error')
+                    session['otp_attempts'] = session.get('otp_attempts', 0) + 1
+                    return render_template('verify_otp.html')
+                
+                # Mark OTP as used
+                supabase_client.table('password_resets').update({'used': True}).eq('id', otp_data['id']).execute()
+                
+                # Store verification status in session
+                session['verified_for_reset'] = True
+                session.pop('otp_attempts', None)
+                
+                flash('تم التحقق بنجاح، يمكنك الآن تعيين كلمة مرور جديدة', 'success')
+                return redirect(url_for('set_new_password'))
+            else:
+                session['otp_attempts'] = session.get('otp_attempts', 0) + 1
+                remaining_attempts = 3 - session['otp_attempts']
+                if remaining_attempts > 0:
+                    flash(f'رمز التحقق غير صحيح. لديك {remaining_attempts} محاولات متبقية', 'error')
+                else:
+                    flash('لقد استنفذت جميع محاولات التحقق', 'error')
+                    session.clear()
+                    return redirect(url_for('forgot_password'))
+                
+        except Exception as e:
+            flash('حدث خطأ في التحقق', 'error')
+            print(f"OTP verification error: {e}")
+    
+    # Show which email the OTP was sent to
+    return render_template('verify_otp.html', user_email=user_email)
+
+@app.route('/cleanup-expired-otps')
+def cleanup_expired_otps():
+    """Clean up expired OTPs (can be called periodically)"""
+    try:
+        current_time = datetime.now(timezone.utc).isoformat()
+        result = supabase_client.table('password_resets').delete().lt('expires_at', current_time).execute()
+        print(f"✅ Cleaned up {len(result.data)} expired OTPs")
+        return f"Cleaned up {len(result.data)} expired OTPs"
+    except Exception as e:
+        print(f"❌ Cleanup error: {e}")
+        return f"Cleanup error: {e}"
+
+def send_otp_email(email, otp_code, username):
+    """
+    Send OTP email with proper Unicode encoding for Arabic
+    """
+    email_user = os.getenv('MAIL_USERNAME')
+    email_password = os.getenv('MAIL_PASSWORD')
+    
+    # If no email credentials are set, use fallback
+    if not email_user or not email_password:
+        print(f"📧 EMAIL CREDENTIALS NOT SET - OTP for {email}: {otp_code}")
+        flash(f'في وضع التطوير: رمز التحقق هو {otp_code}', 'info')
+        return True
+    
+    try:
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        from email.header import Header
+        
+        # Create message with proper encoding
+        msg = MIMEMultipart()
+        
+        # Set subject with proper encoding for Arabic
+        subject = "رمز التحقق - SaudiArcade"
+        msg['Subject'] = Header(subject, 'utf-8')
+        
+        # Set from and to with proper encoding
+        msg['From'] = Header(f"منصة سعودي أركيد <{email_user}>", 'utf-8')
+        msg['To'] = Header(email, 'utf-8')
+        
+        # Create email body with Arabic text
+        arabic_body = f"""
+        مرحباً {username},
+        
+        رمز التحقق الخاص بك هو: {otp_code}
+        
+        ⏰ هذا الرمز صالح لمدة 15 دقيقة فقط
+        
+        إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد.
+        
+        شكراً لك،
+        فريق منصة سعودي أركيد
+        """
+        
+        # Create both plain text and HTML versions
+        plain_text = MIMEText(arabic_body, 'plain', 'utf-8')
+        msg.attach(plain_text)
+        
+        # Connect and send with proper encoding
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()  # Important for UTF-8 support
+            server.login(email_user, email_password)
+            
+            # Send with explicit UTF-8 encoding
+            server.sendmail(
+                email_user, 
+                [email], 
+                msg.as_string().encode('utf-8')
+            )
+        
+        print(f"✅ Email sent successfully to {email}")
+        flash('تم إرسال رمز التحقق إلى بريدك الإلكتروني', 'success')
+        return True
+        
+    except Exception as e:
+        print(f"❌ Email failed: {e}")
+        # Fallback to showing OTP on screen
+        flash(f'لم نتمكن من إرسال البريد. رمز التحقق هو: {otp_code}', 'warning')
+        return True
+    
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        
+        # Basic email validation
+        if not email or '@' not in email:
+            flash('صيغة البريد الإلكتروني غير صحيحة', 'error')
+            return render_template('forgot_password.html')
+        
+        try:
+            # Check if email exists in database and get user data
+            response = supabase_client.table('users').select('id, email, username').eq('email', email).execute()
+            
+            if response.data:
+                user_data = response.data[0]
+                user_id = user_data['id']
+                username = user_data['username']
+                user_email = user_data['email']  # The actual email from database
+                
+                # ✅ CRITICAL: Verify the entered email matches the account email
+                if email != user_email:
+                    flash('البريد الإلكتروني لا يتطابق مع حساب المستخدم', 'error')
+                    return render_template('forgot_password.html')
+                
+                # Generate OTP (6-digit code)
+                otp_code = str(random.randint(100000, 999999))
+                
+                # Use timezone-aware datetime
+                otp_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+                
+                # Store OTP in database for this specific user
+                reset_data = {
+                    'user_id': user_id,  # Store user ID for extra verification
+                    'email': user_email,  # Use the email from database, not form
+                    'otp_code': otp_code,
+                    'expires_at': otp_expires.isoformat(),
+                    'used': False
+                }
+                
+                # Insert into password_resets table
+                reset_response = supabase_client.table('password_resets').insert(reset_data).execute()
+                
+                if reset_response.data:
+                    # 🔥 SEND OTP TO THE USER'S REGISTERED EMAIL
+                    email_sent = send_otp_email(user_email, otp_code, username)
+                    
+                    if email_sent:
+                        flash(f'تم إرسال رمز التحقق إلى بريدك المسجل: {user_email}', 'success')
+                    else:
+                        flash(f'تم إنشاء رمز التحقق ولكن حدث خطأ في الإرسال إلى {user_email}', 'warning')
+                    
+                    # Store both user ID and email for verification
+                    session['reset_user_id'] = user_id
+                    session['reset_email'] = user_email  # The actual account email
+                    session['otp_attempts'] = 0
+                    session['otp_created_at'] = datetime.now(timezone.utc).isoformat()
+                    
+                    return redirect(url_for('verify_otp'))
+                else:
+                    flash('فشل في إنشاء رمز التحقق', 'error')
+            else:
+                flash('البريد الإلكتروني غير مسجل في النظام', 'error')
+                
+        except Exception as e:
+            flash('حدث خطأ في إرسال رمز التحقق', 'error')
+            print(f"Forgot password error: {e}")
+    
+    return render_template('forgot_password.html')
+
+@app.route('/debug-email')
+def debug_email():
+    """Debug email configuration"""
+    email_user = os.getenv('MAIL_USERNAME')
+    email_password = os.getenv('MAIL_PASSWORD')
+    
+    return f"""
+    Email User: {email_user}<br>
+    Email Password: {email_password}<br>
+    Server: {os.getenv('MAIL_SERVER')}<br>
+    Port: {os.getenv('MAIL_PORT')}
+    """
+
+@app.route('/test-email')
+def test_email():
+    try:
+        # Test email configuration
+        msg = Message(
+            subject='Test Email from SaudiArcade',
+            recipients=['test@example.com'],
+            body='This is a test email from your Flask application.'
+        )
+        mail.send(msg)
+        return '✅ Email sent successfully!'
+    except Exception as e:
+        return f'❌ Email failed: {str(e)}'
+
+@app.route('/set-new-password', methods=['GET', 'POST'])
+def set_new_password():
+    # Check if we have the user data and it's verified
+    if 'reset_user_id' not in session or 'reset_email' not in session or not session.get('verified_for_reset'):
+        flash('يرجى التحقق أولاً', 'error')
+        return redirect(url_for('forgot_password'))
+    
+    # Get the actual user data from session
+    user_id = session['reset_user_id']
+    user_email = session['reset_email']  # The actual account email
+    
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        if new_password != confirm_password:
+            flash('كلمات المرور غير متطابقة', 'error')
+            return render_template('set_new_password.html')
+        
+        if len(new_password) < 8:
+            flash('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 'error')
+            return render_template('set_new_password.html')
+        
+        try:
+            # ✅ CRITICAL: Update password for this specific user ID
+            hashed_password = generate_password_hash(new_password)
+            update_response = supabase_client.table('users').update({
+                'password': hashed_password,
+                'updated_at': datetime.now(timezone.utc).isoformat()
+            }).eq('id', user_id).execute()  # Use user ID for security
+            
+            if update_response.data:
+                # Clean up session and OTP records for this user
+                session.clear()
+                
+                # Delete all OTPs for this user
+                supabase_client.table('password_resets').delete().eq('user_id', user_id).execute()
+                
+                flash('تم إعادة تعيين كلمة المرور بنجاح', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('فشل في إعادة تعيين كلمة المرور', 'error')
+                
+        except Exception as e:
+            flash('حدث خطأ في إعادة تعيين كلمة المرور', 'error')
+            print(f"Password reset error: {e}")
+    
+    return render_template('set_new_password.html')
+    
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():  # ← This name must match url_for('change_password')
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+    
+    # Validation
+    if new_password != confirm_password:
+        flash('كلمات المرور غير متطابقة', 'error')
+        return redirect(url_for('account') + '#security')
+    
+    if len(new_password) < 8:
+        flash('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 'error')
+        return redirect(url_for('account') + '#security')
+    
+    try:
+        # Get current user's password from database
+        response = supabase_client.table('users').select('password').eq('id', current_user.id).execute()
+        
+        if not response.data:
+            flash('المستخدم غير موجود', 'error')
+            return redirect(url_for('account') + '#security')
+        
+        current_hashed_password = response.data[0]['password']
+        
+        # Verify current password
+        if not check_password_hash(current_hashed_password, current_password):
+            flash('كلمة المرور الحالية غير صحيحة', 'error')
+            return redirect(url_for('account') + '#security')
+        
+        # Update password in database
+        new_hashed_password = generate_password_hash(new_password)
+        update_response = supabase_client.table('users').update({
+            'password': new_hashed_password,
+            'updated_at': datetime.datetime.now().isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            flash('تم تغيير كلمة المرور بنجاح', 'success')
+            # Log the user out for security
+            logout_user()
+            flash('يرجى تسجيل الدخول مرة أخرى بكلمة المرور الجديدة', 'info')
+            return redirect(url_for('login'))
+        else:
+            flash('فشل في تغيير كلمة المرور', 'error')
+            
+    except Exception as e:
+        flash('حدث خطأ في تغيير كلمة المرور', 'error')
+        print(f"Password change error: {e}")
+    
+    return redirect(url_for('account') + '#security')
 
 @app.route('/upload')
+@login_required
 def upload():
+    if not current_user.is_developer():
+        flash('يجب أن تكون مطوراً لرفع الألعاب', 'error')
+        return redirect(url_for('account'))
     return render_template('upload.html')
 
 @app.route('/games')
@@ -173,7 +703,6 @@ def game_details(game_slug):
     if not game:
         return "Game not found", 404
     
-    # Sanitize YouTube URL
     if 'youtube.com' in game['video_url']:
         game['safe_video_url'] = game['video_url'].replace('watch?v=', 'embed/')
     else:
@@ -181,32 +710,5 @@ def game_details(game_slug):
     
     return render_template('game_details.html', game=game)
 
-# Add this route
-# Add these routes
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        # Handle registration logic here
-        return redirect(url_for('login'))  # Redirect to login after registration
-    return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # Handle login logic here
-        return redirect(url_for('account'))  # Redirect to account after login
-    return render_template('login.html')
-
-@app.route('/account')
-def account():
-    return render_template('account.html')
-
-@app.route('/logout')
-def logout():
-    # Handle logout logic here
-    return redirect(url_for('home'))
-
-# Don't forget to add these imports at the top if needed
-# from werkzeug.security import generate_password_hash
 if __name__ == '__main__':
     app.run(debug=True)

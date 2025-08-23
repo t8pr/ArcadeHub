@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-mobile-alt"></i> التحقق</h1>
+            <p>أدخل رمز التحقق الذي تم إرساله إلى بريدك الإلكتروني</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="otp_code">رمز التحقق (6 أرقام):</label>
+                <input type="text" id="otp_code" name="otp_code" required 
+                       pattern="[0-9]{6}" maxlength="6" placeholder="123456">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> التحقق
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>لم تستلم الرمز؟ <a href="{{ url_for('forgot_password') }}">إعادة الإرسال</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

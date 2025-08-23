@@ -2564,3 +2564,125 @@ body.menu-open {
         justify-content: center;
     }
 }
+
+/* Flash messages */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Flash messages */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.back-to-login {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.back-link {
+    color: #8f8f8f;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    color: #2EC630;
+}
+
+.email-confirmation {
+    background: #3d3d3d;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border: 1px solid #2EC630;
+}
+
+.email-confirmation i {
+    color: #2EC630;
+    margin-left: 0.5rem;
+}
+/* Form styling */
+#username-form {
+    margin-top: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.info-item label {
+    font-weight: bold;
+    color: #2EC630;
+    min-width: 120px;
+}
+
+.info-item span {
+    color: #f0f0f0;
+    flex: 1;
+    text-align: left;
+}
+
+#username-edit {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #2EC630;
+    border-radius: 4px;
+    background: #2d2d2d;
+    color: #f0f0f0;
+    font-size: 1rem;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}

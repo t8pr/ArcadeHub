@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}منصة ألعاب عربية{% endblock %}</title>
+    <title>SaudiArcade</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/jpeg">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -24,8 +25,17 @@
                 <ul class="nav-links" id="navLinks">
                     <li><a href="{{ url_for('home') }}"><i class="fas"></i> الرئيسية</a></li>
                     <li><a href="{{ url_for('games') }}"><i class="fas"></i> الألعاب</a></li>
-                    <li><a href="{{ url_for('upload') }}"><i class="fas "></i> رفع لعبة</a></li>
-                    <li><a href="{{ url_for('register') }}"><i class="fas"></i>سجل دخولك</a></li>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_developer() %}
+                        <li><a href="{{ url_for('upload') }}"><i class="fas "></i> رفع لعبة</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('account') }}"><i class="fas"></i> حسابي</a></li>
+                        <li><a href="{{ url_for('logout') }}"><i class="fas"></i> تسجيل الخروج</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}"><i class="fas"></i>تسجيل الدخول</a></li>
+                        <li><a href="{{ url_for('register') }}"><i class="fas"></i>إنشاء حساب</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
