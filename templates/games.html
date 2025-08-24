@@ -1,17 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}الرئيسية - منصة ألعاب عربية{% endblock %}
+{% block title %}الألعاب - منصة ألعاب عربية{% endblock %}
 
 {% block content %}
     <main class="container">
         <section class="games-section">
             <h1><i class="fas fa-gamepad"></i> الألعاب المتاحة</h1>
             
-            <div class="games-grid">
+            <!-- Search and Filter Section -->
+            <div class="games-filters">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="gameSearch" placeholder="ابحث عن لعبة..." onkeyup="filterGames()">
+                </div>
+                
+                <div class="filter-options">
+                    <select id="categoryFilter" onchange="filterGames()">
+                        <option value="">جميع التصنيفات</option>
+                        <option value="action">أكشن</option>
+                        <option value="adventure">مغامرة</option>
+                        <option value="puzzle">ألغاز</option>
+                        <option value="strategy">إستراتيجية</option>
+                        <option value="sports">رياضة</option>
+                        <option value="racing">سباقات</option>
+                        <option value="educational">تعليمية</option>
+                    </select>
+                    
+                    <select id="sortFilter" onchange="sortGames()">
+                        <option value="newest">الأحدث</option>
+                        <option value="popular">الأكثر شهرة</option>
+                        <option value="rating">الأعلى تقييماً</option>
+                        <option value="name">حسب الاسم</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="games-grid" id="gamesGrid">
                 {% for game in games %}
                 <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="game-card">
                     <div class="game-thumbnail">
-                        <img src="{{ game.thumbnail }}" alt="{{ game.title }}">
+                        <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default-game.png') }}'">
+                        <div class="game-badge">مجاني</div>
                     </div>
                     <div class="game-info">
                         <h3>{{ game.title }}</h3>
@@ -21,18 +50,307 @@
                             <div class="rating">
                                 <i class="fas fa-star"></i> {{ game.rating }}
                             </div>
-                            <div class="price">
-                                {% if game.price > 0 %}
-                                    {{ game.price }} ر.س
-                                {% else %}
-                                    مجاني
-                                {% endif %}
+                            <div class="downloads">
+                                <i class="fas fa-download"></i> {{ game.downloads }}
                             </div>
+                            <div class="size">
+                                <i class="fas fa-database"></i> {{ game.size }}
+                            </div>
+                        </div>
+                        <div class="game-category">
+                            <span class="category-tag">{{ game.category }}</span>
                         </div>
                     </div>
                 </a>
                 {% endfor %}
             </div>
+            
+            {% if not games %}
+            <div class="empty-state">
+                <i class="fas fa-gamepad"></i>
+                <h3>لا توجد ألعاب متاحة حالياً</h3>
+                <p>كن أول من يرفع لعبة على المنصة</p>
+                {% if current_user.is_authenticated and current_user.is_developer() %}
+                <a href="{{ url_for('upload') }}" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> رفع لعبة جديدة
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
         </section>
     </main>
+
+    <script>
+    // Filter games based on search and category
+    function filterGames() {
+        const searchText = document.getElementById('gameSearch').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value;
+        const gameCards = document.querySelectorAll('.game-card');
+        
+        gameCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const description = card.querySelector('.description').textContent.toLowerCase();
+            const gameCategory = card.querySelector('.category-tag').textContent.toLowerCase();
+            const developer = card.querySelector('.developer').textContent.toLowerCase();
+            
+            const matchesSearch = title.includes(searchText) || 
+                                description.includes(searchText) ||
+                                developer.includes(searchText);
+            
+            const matchesCategory = !category || gameCategory === category;
+            
+            if (matchesSearch && matchesCategory) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    // Sort games based on selected option
+    function sortGames() {
+        const sortBy = document.getElementById('sortFilter').value;
+        const gamesGrid = document.getElementById('gamesGrid');
+        const gameCards = Array.from(gamesGrid.querySelectorAll('.game-card'));
+        
+        gameCards.sort((a, b) => {
+            switch(sortBy) {
+                case 'newest':
+                    // Assuming you have a release_date field
+                    return new Date(b.dataset.date || 0) - new Date(a.dataset.date || 0);
+                
+                case 'popular':
+                    const aDownloads = parseInt(a.querySelector('.downloads').textContent) || 0;
+                    const bDownloads = parseInt(b.querySelector('.downloads').textContent) || 0;
+                    return bDownloads - aDownloads;
+                
+                case 'rating':
+                    const aRating = parseFloat(a.querySelector('.rating').textContent) || 0;
+                    const bRating = parseFloat(b.querySelector('.rating').textContent) || 0;
+                    return bRating - aRating;
+                
+                case 'name':
+                    const aName = a.querySelector('h3').textContent;
+                    const bName = b.querySelector('h3').textContent;
+                    return aName.localeCompare(bName);
+                
+                default:
+                    return 0;
+            }
+        });
+        
+        // Remove all cards and re-add in sorted order
+        gameCards.forEach(card => gamesGrid.appendChild(card));
+    }
+    
+    // Initialize games with data attributes for sorting
+    document.addEventListener('DOMContentLoaded', function() {
+        const gameCards = document.querySelectorAll('.game-card');
+        gameCards.forEach(card => {
+            // You might want to add data-date attribute to your game cards
+            // based on your actual data structure
+        });
+    });
+    </script>
+
+    <style>
+    .games-section {
+        padding: 2rem 0;
+    }
+    
+    .games-filters {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 250px;
+    }
+    
+    .search-box i {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #8f8f8f;
+    }
+    
+    .search-box input {
+        width: 100%;
+        padding: 0.8rem 3rem 0.8rem 1rem;
+        border-radius: 8px;
+        color: #f0f0f0;
+        font-family: 'Tajawal', sans-serif;
+    }
+    
+    .search-box input:focus {
+        outline: none;
+        border-color: #2EC630;
+    }
+    
+    .filter-options {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-options select {
+        padding: 0.8rem;
+        border: 1px solid #444;
+        border-radius: 8px;
+        background: #3d3d3d;
+        color: #f0f0f0;
+        font-family: 'Tajawal', sans-serif;
+        min-width: 150px;
+    }
+    
+    .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+    
+    .game-card {
+        background: #2d2d2d;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .game-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .game-thumbnail {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .game-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .game-card:hover .game-thumbnail img {
+        transform: scale(1.05);
+    }
+    
+    .game-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: #2EC630;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    
+    .game-info {
+        padding: 1.5rem;
+    }
+    
+    .game-info h3 {
+        color: #f0f0f0;
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .developer {
+        color: #2EC630;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .description {
+        color: #b0b0b0;
+        margin-bottom: 1.2rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .game-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .rating, .downloads, .size {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: #8f8f8f;
+        font-size: 0.9rem;
+    }
+    
+    .rating {
+        color: #f39c12;
+    }
+    
+    .game-category {
+        margin-top: 0.5rem;
+    }
+    
+    .category-tag {
+        background: rgba(46, 198, 48, 0.1);
+        color: #2EC630;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        border: 1px solid rgba(46, 198, 48, 0.3);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #b0b0b0;
+        grid-column: 1 / -1;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #2EC630;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        color: #f0f0f0;
+        margin-bottom: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .games-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .filter-options {
+            flex-direction: column;
+        }
+        
+        .games-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
 {% endblock %}

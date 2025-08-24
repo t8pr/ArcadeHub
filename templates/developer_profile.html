@@ -1,0 +1,1176 @@
+{% extends "base.html" %}
+
+{% block title %}ملف المطور - {{ developer.username }}{% endblock %}
+
+{% block content %}
+<div class="developer-profile-container">
+    <!-- Developer Header -->
+    <div class="developer-header">
+        <div class="developer-hero">
+            <div class="developer-avatar">
+                <div class="avatar-image">
+                    <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="developer">
+                </div>
+                <div class="verification-badge" title="مطور موثوق">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            <div class="developer-info">
+                <h1>{{ developer.username }}</h1>
+                <p class="developer-bio">{{ developer.bio or 'مطور ألعاب في منصة SaudiArcade' }}</p>
+                
+                <div class="developer-stats">
+                    <div class="stat">
+                        <span class="stat-number">{{ developer.games_count }}</span>
+                        <span class="stat-label">ألعاب</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">{{ developer.total_downloads }}</span>
+                        <span class="stat-label">تحميل</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">{{ developer.average_rating }}</span>
+                        <span class="stat-label">تقييم</span>
+                    </div>
+                    <div class="stat">
+                    <span class="stat-number">{{ developer.join_date[:4] if developer.join_date and developer.join_date|length >= 4 else '2025' }}</span>
+                    <span class="stat-label">سنة الانضمام</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="developer-actions">
+            <button class="btn-share" onclick="shareDeveloper()">
+                <i class="fas fa-share-alt"></i>
+                مشاركة الملف
+            </button>
+            {% if current_user.is_authenticated and current_user.id == developer.id %}
+            <a href="{{ url_for('account') }}" class="btn-edit">
+                <i class="fas fa-edit"></i>
+                تعديل الملف
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Developer Details -->
+    <div class="developer-details">
+        <div class="details-grid">
+            <!-- About Section -->
+            <div class="detail-card">
+                <h3><i class="fas fa-envelope"></i> معلومات التواصل</h3>
+                <div class="contact-info">
+                    {% if developer.email %}
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ developer.email }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if developer.social_media and (developer.social_media.website or developer.social_media.twitter or developer.social_media.linkedin or developer.social_media.github) %}
+                    <div class="social-links">
+                        {% if developer.social_media.website %}
+                        <a href="{{ developer.social_media.website }}" class="social-link" target="_blank" title="الموقع الشخصي">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% if developer.social_media.twitter %}
+                        <a href="{{ developer.social_media.twitter }}" class="social-link" target="_blank" title="تويتر">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% if developer.social_media.linkedin %}
+                        <a href="{{ developer.social_media.linkedin }}" class="social-link" target="_blank" title="لينكد إن">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        {% endif %}
+                        
+                        {% if developer.social_media.github %}
+                        <a href="{{ developer.social_media.github }}" class="social-link" target="_blank" title="جيت هاب">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="detail-card">
+                <h3><i class="fas fa-code"></i> المهارات التقنية</h3>
+                <div class="skills-list">
+                    {% if developer.skills %}
+                        {% for skill in developer.skills %}
+                        <div class="skill-item">
+                            <span class="skill-name">{{ skill.name if skill.name else skill }}</span>
+                            <div class="skill-level">
+                                <div class="skill-progress" style="width: {{ skill.level if skill.level else '70' }}%;"></div>
+                            </div>
+                            <span class="skill-percentage">{{ skill.level if skill.level else '70' }}%</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="skill-item">
+                            <span class="skill-name">Unity</span>
+                            <div class="skill-level">
+                                <div class="skill-progress" style="width: 85%;"></div>
+                            </div>
+                            <span class="skill-percentage">85%</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-name">C#</span>
+                            <div class="skill-level">
+                                <div class="skill-progress" style="width: 78%;"></div>
+                            </div>
+                            <span class="skill-percentage">78%</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-name">Game Design</span>
+                            <div class="skill-level">
+                                <div class="skill-progress" style="width: 90%;"></div>
+                            </div>
+                            <span class="skill-percentage">90%</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Languages Section -->
+            <div class="detail-card">
+                <h3><i class="fas fa-globe"></i> اللغات</h3>
+                <div class="languages-list">
+                    {% if developer.languages %}
+                        {% for language in developer.languages %}
+                        <div class="language-item">
+                            <span class="language-name">{{ language.name if language.name else language }}</span>
+                            <div class="language-level">
+                                <div class="language-progress" style="width: {{ language.level if language.level else '100' }}%;"></div>
+                            </div>
+                            <span class="language-proficiency">{{ language.proficiency if language.proficiency else 'متقن' }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="language-item">
+                            <span class="language-name">العربية</span>
+                            <div class="language-level">
+                                <div class="language-progress" style="width: 100%;"></div>
+                            </div>
+                            <span class="language-proficiency">اللغة الأم</span>
+                        </div>
+                        <div class="language-item">
+                            <span class="language-name">English</span>
+                            <div class="language-level">
+                                <div class="language-progress" style="width: 80%;"></div>
+                            </div>
+                            <span class="language-proficiency">متقدم</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Contact Section -->
+        </div>
+    </div>
+
+    <!-- Developer Games -->
+    <div class="developer-games-section">
+        <div class="section-header">
+            <h2><i class="fas fa-gamepad"></i> ألعاب المطور</h2>
+            <span class="games-count">{{ games|length }} لعبة</span>
+        </div>
+        
+        {% if games %}
+        <div class="games-grid">
+            {% for game in games %}
+            <div class="game-card">
+                <div class="game-thumbnail">
+                    <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" onerror="this.src='{{ url_for('static', filename='images/default-game.png') }}'">
+                    <div class="game-overlay">
+                        <button class="btn-quick-view" onclick="window.location.href='{{ url_for('game_details', game_slug=game.slug) }}'">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="game-info">
+                    <h3>{{ game.title }}</h3>
+                    <p class="description">{{ game.short_description }}</p>
+                    <div class="game-meta">
+                        <div class="rating">
+                            <i class="fas fa-star"></i> {{ game.rating }}
+                        </div>
+                        <div class="downloads">
+                            <i class="fas fa-download"></i> {{ game.downloads }}
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="btn-view-game">
+                            <i class="fas fa-eye"></i> عرض اللعبة
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-gamepad"></i>
+            <h3>لا توجد ألعاب حتى الآن</h3>
+            <p>هذا المطور لم يقم برفع أي ألعاب بعد</p>
+        </div>
+        {% endif %}
+    </div>
+
+<!-- Share Modal -->
+<div id="shareModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeShareModal()">&times;</span>
+        <h3><i class="fas fa-share-alt"></i> مشاركة ملف المطور</h3>
+        <p>انسخ الرابط أدناه لمشاركته:</p>
+        <div class="share-link">
+            <input type="text" id="shareUrl" readonly value="{{ url_for('developer_share', dev_id=developer.id, _external=True) }}">
+            <button onclick="copyShareLink()">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+        <div class="social-share">
+            <button class="social-btn twitter" onclick="shareOnTwitter()">
+                <i class="fab fa-twitter"></i>
+            </button>
+            <button class="social-btn linkedin" onclick="shareOnLinkedIn()">
+                <i class="fab fa-linkedin"></i>
+            </button>
+            <button class="social-btn whatsapp" onclick="shareOnWhatsApp()">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Share functionality
+
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '12px 20px';
+    notification.style.borderRadius = '8px';
+    notification.style.zIndex = '10000';
+    notification.style.fontWeight = 'bold';
+    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    
+    if (type === 'success') {
+        notification.style.background = '#2EC630';
+        notification.style.color = 'white';
+    } else {
+        notification.style.background = '#e74c3c';
+        notification.style.color = 'white';
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = 0;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showNotification('تم نسخ رابط الملف الشخصي إلى الحافظة');
+        } else {
+            showNotification('فشل في نسخ الرابط، يرجى المحاولة مرة أخرى', 'error');
+        }
+    } catch (err) {
+        showNotification('فشل في نسخ الرابط، يرجى المحاولة مرة أخرى', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function shareDeveloper() {
+    // Get the current profile URL (without any hash or query parameters)
+    const profileUrl = window.location.origin + "{{ url_for('developer_profile', dev_id=developer.id) }}";
+    
+    // Use the modern Clipboard API if available
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(profileUrl)
+            .then(() => {
+                showNotification('تم نسخ رابط الملف الشخصي إلى الحافظة');
+            })
+            .catch(err => {
+                fallbackCopyToClipboard(profileUrl);
+            });
+    } else {
+        // Fallback for older browsers
+        fallbackCopyToClipboard(profileUrl);
+    }
+}
+
+function closeShareModal() {
+    document.getElementById('shareModal').style.display = 'none';
+}
+
+function copyShareLink() {
+    const input = document.getElementById('shareUrl');
+    input.select();
+    document.execCommand('copy');
+}
+
+function shareOnTwitter() {
+    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function shareOnLinkedIn() {
+    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+}
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
+    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+}
+
+// Contact functionality
+function contactDeveloper() {
+    const modal = document.getElementById('contactModal');
+    modal.style.display = 'block';
+}
+
+function closeContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const shareModal = document.getElementById('shareModal');
+    const contactModal = document.getElementById('contactModal');
+    
+    if (event.target === shareModal) {
+        closeShareModal();
+    }
+    
+    if (event.target === contactModal) {
+        closeContactModal();
+    }
+}
+
+</script>
+
+<style>
+/* Developer Profile Styles */
+.developer-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.developer-header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.developer-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 80%, rgba(46, 198, 48, 0.1) 0%, transparent 50%);
+}
+
+.developer-hero {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.developer-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.developer-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2EC630, #25a328);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: white;
+    border: 4px solid #3d3d3d;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.verification-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: #3498db;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #2d2d2d;
+}
+
+.developer-info {
+    flex: 1;
+}
+
+.developer-info h1 {
+    color: #f0f0f0;
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.developer-bio {
+    color: #b0b0b0;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+.developer-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    text-align: center;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    min-width: 120px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #2EC630;
+    margin-bottom: 0.3rem;
+}
+
+.stat-label {
+    color: #8f8f8f;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.developer-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-share, .btn-contact, .btn-edit {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-share {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.btn-contact {
+    background: linear-gradient(135deg, #2EC630, #25a328);
+    color: white;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-share:hover, .btn-contact:hover, .btn-edit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Developer Details */
+.developer-details {
+    margin-bottom: 3rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.detail-card {
+    background: #2d2d2d;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.detail-card:hover {
+    transform: translateY(-5px);
+}
+
+.detail-card h3 {
+    color: #2EC630;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-bottom: 2px solid #3d3d3d;
+    padding-bottom: 0.8rem;
+}
+
+.detail-content p {
+    color: #f0f0f0;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #b0b0b0;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.detail-item i {
+    color: #2EC630;
+    width: 20px;
+    font-size: 1.1rem;
+}
+
+/* Skills & Languages */
+.skills-list, .languages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.skill-item, .language-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.skill-name, .language-name {
+    color: #f0f0f0;
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.skill-level, .language-level {
+    flex: 1;
+    height: 8px;
+    background: #3d3d3d;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-progress, .language-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #2EC630, #25a328);
+    border-radius: 10px;
+    transition: width 1s ease;
+}
+
+.skill-percentage, .language-proficiency {
+    color: #8f8f8f;
+    font-size: 0.9rem;
+    min-width: 50px;
+    text-align: left;
+}
+
+/* Contact Info */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #b0b0b0;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.contact-item i {
+    color: #2EC630;
+    width: 20px;
+}
+
+.contact-item a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.contact-item a:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.social-link {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    background: #2EC630;
+    color: white;
+}
+
+.btn-contact-full {
+    background: linear-gradient(135deg, #2EC630, #25a328);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-contact-full:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 198, 48, 0.3);
+}
+
+/* Games Section */
+.developer-games-section {
+    background: #2d2d2d;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    color: #2EC630;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.games-count {
+    color: #8f8f8f;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.game-card {
+    background: #3d3d3d;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.game-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.game-thumbnail {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.game-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.game-card:hover .game-thumbnail img {
+    transform: scale(1.05);
+}
+
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.game-card:hover .game-overlay {
+    opacity: 1;
+}
+
+.btn-quick-view {
+    background: #2EC630;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.btn-quick-view:hover {
+    transform: scale(1.1);
+}
+
+.game-info {
+    padding: 1.5rem;
+}
+
+.game-info h3 {
+    color: #f0f0f0;
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+}
+
+.description {
+    color: #b0b0b0;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.game-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.rating, .downloads {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #8f8f8f;
+    font-size: 0.9rem;
+}
+
+.rating {
+    color: #f39c12;
+}
+
+.game-actions {
+    display: flex;
+}
+
+.btn-view-game {
+    display: block;
+    text-align: center;
+    background: rgba(46, 198, 48, 0.15);
+    color: #2EC630;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    flex: 1;
+}
+
+.btn-view-game:hover {
+    background: rgba(46, 198, 48, 0.25);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #b0b0b0;
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #2EC630;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #2d2d2d;
+    margin: 10% auto;
+    padding: 2.5rem;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h3 {
+    color: #2EC630;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.modal-content p {
+    color: #b0b0b0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #f0f0f0;
+}
+
+.share-link {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.share-link input {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.share-link button {
+    background: #2EC630;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.share-link button:hover {
+    background: #25a328;
+}
+
+.social-share {
+    display: flex;
+    flex-direction: row;
+    gap: 0.8rem;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.social-btn {
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+}
+
+.twitter { background: #1DA1F2; color: white; }
+.linkedin { background: #0077B5; color: white; }
+.whatsapp { background: #25D366; color: white; }
+
+/* Contact Form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: #f0f0f0;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2EC630;
+}
+
+.btn-send-message {
+    background: linear-gradient(135deg, #2EC630, #25a328);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-send-message:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 198, 48, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .developer-hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .developer-stats {
+        justify-content: center;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .developer-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .developer-info h1 {
+        font-size: 2.2rem;
+    }
+    
+    .developer-stats {
+        gap: 1.5rem;
+    }
+    
+    .stat {
+        min-width: 100px;
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+    }
+    
+    .developer-actions {
+        flex-direction: column;
+    }
+    
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+    
+}
+
+@media (max-width: 480px) {
+    .developer-profile-container {
+        padding: 0.5rem;
+    }
+    
+    .developer-header {
+        padding: 1.5rem;
+    }
+    
+    .avatar-image {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+    
+    .developer-info h1 {
+        font-size: 1.8rem;
+    }
+    
+    .stat {
+        min-width: 80px;
+        padding: 0.8rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .developer-games-section,
+    .achievements-section {
+        padding: 1.5rem;
+    }
+    
+    .modal-content {
+        padding: 1.5rem;
+    }
+}
+
+.fallback-avatar {
+    font-size: 4rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+</style>
+{% endblock %}

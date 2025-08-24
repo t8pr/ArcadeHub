@@ -3,6 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Tajawal';
 }
 
 body {
@@ -58,12 +59,13 @@ nav {
 .nav-links {
     display: flex;
     list-style: none;
-    justify-content: center;
-    flex-grow: 1;
+    margin: 0 2pc 0 0;
+    padding: 0;
+    gap: 1.5rem;
 }
 
 .nav-links li {
-    margin: 0 1rem;
+    margin: auto;
 }
 
 .nav-links a {
@@ -2685,4 +2687,73 @@ body.menu-open {
     gap: 1rem;
     margin-top: 1rem;
     justify-content: flex-end;
+}
+
+[file name]: account.html (add to the style section)
+/* Social Media Form Styles */
+.social-media-form {
+    background: #3d3d3d;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.social-media-form .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.social-media-form label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #f0f0f0;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.social-media-form label i {
+    width: 20px;
+    text-align: center;
+    color: #2EC630;
+}
+
+.social-media-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #2d2d2d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.social-media-form input:focus {
+    outline: none;
+    border-color: #2EC630;
+}
+
+/* Social Links in Profile */
+.social-links {
+    display: flex;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.social-link {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-3px);
+    background: #2EC630;
+    color: white;
 }

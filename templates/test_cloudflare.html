@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1><i class="fas fa-cloud"></i> اختبار اتصال Cloudflare R2</h1>
+    
+    <div class="debug-info">
+        <h3>معلومات التكوين:</h3>
+        <table>
+            <tr>
+                <th>المتغير</th>
+                <th>القيمة</th>
+                <th>الحالة</th>
+            </tr>
+            {% for key, value in env_vars.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value if value else 'غير معين' }}</td>
+                <td>
+                    {% if value %}
+                        <span class="status-ok">✅</span>
+                    {% else %}
+                        <span class="status-error">❌</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    
+    <div class="alert {% if success %}alert-success{% else %}alert-error{% endif %}">
+        <h3>{% if success %}✅{% else %}❌{% endif %} {{ message|safe }}</h3>
+        
+        {% if url %}
+        <h4>رابط الملف:</h4>
+        <p><a href="{{ url }}" target="_blank">{{ url }}</a></p>
+        {% endif %}
+    </div>
+    
+    <div class="help-section">
+        <h3>إصلاح مشكلة تزامن الوقت:</h3>
+        <p>إذا كنت تحصل على خطأ "الوقت غير متزامن"، جرب هذه الحلول:</p>
+        <ol>
+            <li>مزامنة وقت النظام مع خادم الوقت (NTP)</li>
+            <li>إعادة تشغيل الخادم/الكمبيوتر</li>
+            <li>التأكد من صحة إعدادات المنطقة الزمنية</li>
+        </ol>
+    </div>
+    
+    <div class="actions">
+        <a href="{{ url_for('test_cloudflare_simple') }}" class="btn btn-secondary">
+            <i class="fas fa-plug"></i> اختبار اتصال بسيط
+        </a>
+        <a href="{{ url_for('account') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> العودة إلى الحساب
+        </a>
+    </div>
+</div>
+
+<style>
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #2d2d2d;
+    border-radius: 12px;
+}
+
+.debug-info {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+}
+
+.debug-info table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.debug-info th, .debug-info td {
+    padding: 0.5rem;
+    text-align: right;
+    border-bottom: 1px solid #555;
+}
+
+.debug-info th {
+    background: #444;
+}
+
+.status-ok {
+    color: #2EC630;
+}
+
+.status-error {
+    color: #e74c3c;
+}
+
+.alert {
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background: rgba(46, 198, 48, 0.1);
+    color: #2EC630;
+    border: 1px solid #2EC630;
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.help-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+}
+
+.help-section ol {
+    padding-right: 1.5rem;
+}
+
+.help-section li {
+    padding: 0.3rem 0;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: #2EC630;
+    color: white;
+}
+
+.btn-secondary {
+    background: #3498db;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %}

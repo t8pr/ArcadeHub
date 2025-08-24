@@ -1,0 +1,46 @@
+{
+  "games": [
+    {
+      "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
+      "developer": "OsamaAlhamdan",
+      "title": "Altima",
+      "description": "القيادة السريعة",
+      "short_description": "حاول الفرار من الشرطة",
+      "category": "action",
+      "price": 30.0,
+      "platform": [
+        "windows",
+        "mac",
+        "linux"
+      ],
+      "video_url": "",
+      "features": [
+        "القوه",
+        "السرعة",
+        "الغضب"
+      ],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/games/e05756f8-cf63-4354-b5cd-4502f35ba5e0/af459644-b8a5-4bd0-9fb9-45f993bd62c8/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250824%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250824T032220Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=82a0e86ac3d6778426401b5eeada80d9777883664a9c8871734ef90ab7bc827b",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/games/e05756f8-cf63-4354-b5cd-4502f35ba5e0/f3cad854-db29-404b-90c3-d88dc9483cad/files/NumberBook.exe?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250824%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250824T032218Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=cd5e56722df29cc3245e0de5787a2b561a6e84fdeb0c10d83044506565bca408",
+          "filename": "NumberBook.exe",
+          "size": 23363435
+        }
+      ],
+      "images": [
+        "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/games/e05756f8-cf63-4354-b5cd-4502f35ba5e0/54751e30-bd73-4559-a64c-ab08926e42da/images/IMG_7428.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250824%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250824T032220Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b79025ced0c89db8a3d8dbac996584356c8fd5d4ba808bf97d19384f9c93aaeb"
+      ],
+      "size": "22.28 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-24T03:22:20.270449+00:00",
+      "rating": 0.0,
+      "downloads": 3,
+      "status": "published",
+      "id": "50ca8ce2-b994-422c-b6d7-45f6d2f0790f",
+      "slug": "altima",
+      "created_at": "2025-08-24 05:22:20.381499",
+      "updated_at": "2025-08-24 06:56:56.081239"
+    }
+  ],
+  "last_updated": "2025-08-24 06:56:56.081249"
+}

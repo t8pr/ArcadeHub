@@ -1,64 +1,697 @@
 {% extends "base.html" %}
 
-{% block title %}الرئيسية - منصة ألعاب عربية{% endblock %}
+{% block title %}رفع لعبة جديدة - منصة ألعاب عربية{% endblock %}
 
 {% block content %}
-
-    <main class="container">
-        <section class="upload-section">
-            <h1><i class="fas fa-upload"></i> رفع لعبة جديدة</h1>
-            
-            <form id="uploadForm" class="upload-form">
+<main class="container">
+    <section class="upload-section">
+        <h1><i class="fas fa-upload"></i> رفع لعبة جديدة</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form id="uploadForm" method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h2><i class="fas fa-info-circle"></i> المعلومات الأساسية</h2>
+                
                 <div class="form-group">
-                    <label for="gameTitle">اسم اللعبة</label>
-                    <input type="text" id="gameTitle" name="gameTitle" required>
+                    <label for="gameTitle">اسم اللعبة *</label>
+                    <input type="text" id="gameTitle" name="title" required placeholder="أدخل اسم اللعبة">
                 </div>
                 
                 <div class="form-group">
-                    <label for="gameDescription">وصف اللعبة</label>
-                    <textarea id="gameDescription" name="gameDescription" rows="5" required></textarea>
+                    <label for="gameDescription">وصف اللعبة *</label>
+                    <textarea id="gameDescription" name="description" rows="5" required placeholder="صف اللعبة بشكل مفصل..."></textarea>
                 </div>
+                
+                <div class="form-group">
+                    <label for="shortDescription">وصف مختصر *</label>
+                    <textarea id="shortDescription" name="short_description" rows="2" required placeholder="وصف مختصر للعبة سيظهر في صفحة الألعاب"></textarea>
+                </div>
+            </div>
+
+            <!-- Category & Platform -->
+            <div class="form-section">
+                <h2><i class="fas fa-tags"></i> التصنيف والمنصة</h2>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="gameCategory">تصنيف اللعبة</label>
-                        <select id="gameCategory" name="gameCategory" required>
+                        <label for="gameCategory">تصنيف اللعبة *</label>
+                        <select id="gameCategory" name="category" required>
                             <option value="">اختر التصنيف</option>
                             <option value="action">أكشن</option>
                             <option value="adventure">مغامرة</option>
                             <option value="puzzle">ألغاز</option>
                             <option value="strategy">إستراتيجية</option>
+                            <option value="sports">رياضة</option>
+                            <option value="racing">سباقات</option>
+                            <option value="educational">تعليمية</option>
                             <option value="other">أخرى</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="gamePrice">السعر (ر.س)</label>
-                        <input type="number" id="gamePrice" name="gamePrice" min="0" value="0" step="0.01">
+                        <label for="gamePlatform">منصات التشغيل *</label>
+                        <select id="gamePlatform" name="platform" multiple required>
+                            <option value="windows">Windows</option>
+                            <option value="mac">Mac</option>
+                            <option value="linux">Linux</option>
+                            <option value="android">Android</option>
+                            <option value="ios">iOS</option>
+                            <option value="web">Web</option>
+                        </select>
+                        <small class="input-hint">اضغط Ctrl لاختيار أكثر من منصة</small>
                     </div>
                 </div>
+            </div>
+
+            <!-- Media Files -->
+            <div class="form-section">
+                <h2><i class="fas fa-images"></i> الوسائط</h2>
                 
+                <div class="form-group">
+                    <label for="gameVideo">رابط فيديو YouTube (اختياري)</label>
+                    <input type="url" id="gameVideo" name="video_url" placeholder="https://youtube.com/embed/...">
+                </div>
+                
+                <!-- Thumbnail Upload -->
                 <div class="form-group file-upload">
-                    <label>ملفات اللعبة</label>
-                    <div class="upload-area" id="uploadArea">
+                    <label>صورة المصغرة * (الحجم الأفضل: 600x400 بكسل)</label>
+                    <div class="upload-area" id="thumbnailArea">
+                        <i class="fas fa-image"></i>
+                        <p>انقر أو اسحب صورة مصغرة للعبة</p>
+                        <p class="file-size-limit">الحجم الأقصى: 5MB</p>
+                        <input type="file" id="thumbnail" name="thumbnail" accept="image/*" required>
+                    </div>
+                    <div id="thumbnailPreview" class="file-preview"></div>
+                </div>
+                <!-- Additional Images -->
+                <div class="form-group file-upload">
+                    <label>صور إضافية للعبة (اختياري)</label>
+                    <div class="upload-area" id="imagesArea">
+                        <i class="fas fa-images"></i>
+                        <p>انقر لرفع صور إضافية للعبة</p>
+                        <p class="file-size-limit">5 صور كحد أقصى</p>
+                        <input type="file" id="images" name="images" multiple accept="image/*" max="5">
+                    </div>
+                    <div id="imagesPreview" class="file-previews"></div>
+                </div>
+                <!-- Game Files Upload -->
+                <div class="form-group file-upload">
+                    <label>ملفات اللعبة * (ZIP, EXE, APK)</label>
+                    <div class="upload-area" id="gameFilesArea">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>اسحب وأفلت ملفات اللعبة هنا أو انقر للاختيار</p>
-                        <input type="file" id="gameFiles" name="gameFiles" multiple required>
+                        <p class="file-size-limit">الحجم الأقصى: 100MB</p>
+                        <input type="file" id="gameFiles" name="game_files" multiple required>
                     </div>
-                    <div id="fileList" class="file-list"></div>
+                    <div id="gameFilesList" class="file-list"></div>
                 </div>
+            </div>
+
+            <!-- Game Features -->
+            <div class="form-section">
+                <h2><i class="fas fa-star"></i> مميزات اللعبة</h2>
                 
+                <div class="form-group">
+                    <label>مميزات اللعبة (اختياري)</label>
+                    <div id="featuresContainer">
+                        <div class="feature-input">
+                            <input type="text" name="features[]" placeholder="أدخل ميزة جديدة">
+                            <button type="button" class="btn-remove-feature" onclick="removeFeature(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addFeature()">
+                        <i class="fas fa-plus"></i> إضافة ميزة
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terms & Submit -->
+            <div class="form-section">
                 <div class="form-group checkbox-group">
-                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
-                    <label for="agreeTerms">أوافق على شروط وأحكام المنصة</label>
+                    <input type="checkbox" id="agreeTerms" name="agree_terms" required>
+                    <label for="agreeTerms">أوافق على <a href="#" style="color: #2EC630;">شروط وأحكام المنصة</a></label>
                 </div>
                 
-                <button type="submit" class="btn btn-upload">
+                <button type="submit" class="btn btn-upload" id="submitBtn">
                     <i class="fas fa-upload"></i> رفع اللعبة
                 </button>
-            </form>
-        </section>
-    </main>
-    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+                
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="progressText">0%</span>
+                        <span id="progressStatus">جاري رفع الملفات...</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
 
+<script>
+// JavaScript for upload functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Thumbnail preview
+    const thumbnailInput = document.getElementById('thumbnail');
+    const thumbnailPreview = document.getElementById('thumbnailPreview');
+    
+    thumbnailInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            // Validate file size
+            if (this.files[0].size > 5 * 1024 * 1024) {
+                alert('حجم الصورة المصغرة يتجاوز الحد المسموح (5MB)');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                thumbnailPreview.innerHTML = `
+                    <div class="preview-item">
+                        <img src="${e.target.result}" alt="Preview">
+                        <span>${thumbnailInput.files[0].name}</span>
+                    </div>
+                `;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    
+    // Game files list
+    const gameFilesInput = document.getElementById('gameFiles');
+    const gameFilesList = document.getElementById('gameFilesList');
+    
+    gameFilesInput.addEventListener('change', updateFileList);
+    
+    function updateFileList() {
+        gameFilesList.innerHTML = '';
+        if (gameFilesInput.files.length > 0) {
+            Array.from(gameFilesInput.files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas fa-file"></i>
+                        <span>${file.name}</span>
+                    </div>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                `;
+                gameFilesList.appendChild(fileItem);
+            });
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Additional images preview
+    const imagesInput = document.getElementById('images');
+    const imagesPreview = document.getElementById('imagesPreview');
+    
+    imagesInput.addEventListener('change', function(e) {
+        imagesPreview.innerHTML = '';
+        if (this.files && this.files.length > 0) {
+            // Validate number of files
+            if (this.files.length > 5) {
+                alert('يمكنك رفع 5 صور كحد أقصى');
+                this.value = '';
+                return;
+            }
+            
+            Array.from(this.files).forEach((file, index) => {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`حجم الصورة ${file.name} يتجاوز الحد المسموح (5MB)`);
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <span>${file.name}</span>
+                    `;
+                    imagesPreview.appendChild(previewItem);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+    
+    // Drag and drop functionality
+    const uploadAreas = document.querySelectorAll('.upload-area');
+    
+    uploadAreas.forEach(area => {
+        area.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            area.classList.add('dragover');
+        });
+        
+        area.addEventListener('dragleave', () => {
+            area.classList.remove('dragover');
+        });
+        
+        area.addEventListener('drop', (e) => {
+            e.preventDefault();
+            area.classList.remove('dragover');
+            const input = area.querySelector('input[type="file"]');
+            input.files = e.dataTransfer.files;
+            
+            // Trigger change event
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        });
+    });
+    
+    // Form validation
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Check if game files are selected
+        if (gameFilesInput.files.length === 0) {
+            isValid = false;
+            errorMessage = 'يرجى اختيار ملفات اللعبة';
+        }
+        
+        // Check if thumbnail is selected
+        if (thumbnailInput.files.length === 0) {
+            isValid = false;
+            errorMessage = 'يرجى اختيار صورة مصغرة للعبة';
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert(errorMessage);
+            return false;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+        document.getElementById('uploadProgress').style.display = 'block';
+    });
+});
+
+// Features management
+function addFeature() {
+    const container = document.getElementById('featuresContainer');
+    const newFeature = document.createElement('div');
+    newFeature.className = 'feature-input';
+    newFeature.innerHTML = `
+        <input type="text" name="features[]" placeholder="أدخل ميزة جديدة">
+        <button type="button" class="btn-remove-feature" onclick="removeFeature(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    container.appendChild(newFeature);
+}
+
+function removeFeature(button) {
+    if (document.querySelectorAll('.feature-input').length > 1) {
+        button.parentElement.remove();
+    }
+}
+</script>
+
+<style>
+.upload-section {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #444;
+}
+
+.form-section h2 {
+    color: #2EC630;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.file-upload {
+    margin: 1.5rem 0;
+}
+
+.upload-area {
+    border: 2px dashed #2EC630;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(46, 198, 48, 0.05);
+    position: relative;
+}
+
+.upload-area:hover {
+    background: rgba(46, 198, 48, 0.1);
+}
+
+.upload-area.dragover {
+    background: rgba(46, 198, 48, 0.2);
+    border-color: #25a328;
+}
+
+.upload-area i {
+    font-size: 2.5rem;
+    color: #2EC630;
+    margin-bottom: 1rem;
+}
+
+.upload-area p {
+    margin: 0.5rem 0;
+}
+
+.file-size-limit {
+    font-size: 0.8rem;
+    color: #8f8f8f;
+    margin-top: 0.5rem;
+}
+
+.upload-area input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-preview, .file-previews {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.preview-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #444;
+}
+
+.preview-item span {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #b0b0b0;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-list {
+    margin-top: 1rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.file-info i {
+    color: #3498db;
+}
+
+.file-size {
+    color: #8f8f8f;
+    font-size: 0.9rem;
+}
+
+.feature-input {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    align-items: center;
+}
+
+.feature-input input {
+    flex: 1;
+}
+
+.btn-remove-feature {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-progress {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #3d3d3d;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2EC630, #25a328);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#progressText {
+    color: #2EC630;
+    font-weight: bold;
+}
+
+.btn-upload {
+    background: #2EC630;
+    color: white;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.btn-upload:hover {
+    background: #25a328;
+    transform: translateY(-2px);
+}
+
+.btn-upload:disabled {
+    background: #8f8f8f;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.upload-progress {
+    margin-top: 1.5rem;
+    background: #3d3d3d;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #2d2d2d;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2EC630, #25a328);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#progressText {
+    color: #2EC630;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+#progressStatus {
+    color: #b0b0b0;
+}
+
+/* Animation for spinner */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Form elements styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #f0f0f0;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2EC630;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-group input {
+    width: auto;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+}
+
+.input-hint {
+    color: #8f8f8f;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background: rgba(46, 198, 48, 0.1);
+    color: #2EC630;
+    border: 1px solid #2EC630;
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+</style>
 {% endblock %}

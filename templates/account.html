@@ -34,6 +34,10 @@
                 </a>
                 
                 {% if user.is_developer() %}
+                <a class="menu-item" target="_blank" href="{{ url_for('developer_profile', dev_id=user.id) }}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>عرض السيرة الذاتية</span>
+                </a>
                 <a href="#my-games" class="menu-item" onclick="showSection('my-games')">
                     <i class="fas fa-gamepad"></i>
                     <span>ألعابي</span>
@@ -200,36 +204,78 @@
 
             <!-- Settings Section -->
             <div id="settings" class="content-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-cog"></i> الإعدادات</h2>
-                </div>
-
-                <div class="settings-content">
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>🔔 الإشعارات</h4>
-                            <p>استقبال إشعارات حول الألعاب الجديدة والتحديثات</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h4>🎮 إشعارات المطور</h4>
-                            <p>إشعارات خاصة بالمطورين حول أداء الألعاب</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" {{ 'checked' if user.is_developer() else '' }}>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> الإعدادات</h2>
             </div>
 
+            <div class="settings-content">
+                <!-- Notification Settings -->
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>🔔 الإشعارات</h4>
+                        <p>استقبال إشعارات حول الألعاب الجديدة والتحديثات</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>🎮 إشعارات المطور</h4>
+                        <p>إشعارات خاصة بالمطورين حول أداء الألعاب</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" {{ 'checked' if user.is_developer() else '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <!-- Social Media Settings (for developers only) -->
+                {% if user.is_developer() %}
+                <div class="setting-item social-media-settings">
+                    <div class="setting-info">
+                        <h4>🌐 وسائل التواصل الاجتماعي</h4>
+                        <p>أضف روابط حساباتك على وسائل التواصل الاجتماعي</p>
+                    </div>
+                </div>
+                
+                <form class="social-media-form" action="{{ url_for('update_social_media') }}" method="POST">
+                    <div class="form-group">
+                        <label><i class="fab fa-twitter"></i> Twitter</label>
+                        <input type="url" name="twitter" placeholder="https://twitter.com/اسم المستخدم" 
+                            value="{{ user_social_media.twitter if user_social_media else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fab fa-linkedin"></i> LinkedIn</label>
+                        <input type="url" name="linkedin" placeholder="https://linkedin.com/in/اسم المستخدم" 
+                            value="{{ user_social_media.linkedin if user_social_media else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fab fa-github"></i> GitHub</label>
+                        <input type="url" name="github" placeholder="https://github.com/اسم المستخدم" 
+                            value="{{ user_social_media.github if user_social_media else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-globe"></i> موقع الويب الشخصي</label>
+                        <input type="url" name="website" placeholder="https://example.com" 
+                            value="{{ user_social_media.website if user_social_media else '' }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ روابط التواصل
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
             <!-- My Games Section (for developers) -->
+            <!-- In the My Games section -->
             {% if user.is_developer() %}
             <div id="my-games" class="content-section">
                 <div class="section-header">
@@ -238,16 +284,44 @@
                         <i class="fas fa-plus"></i> إضافة لعبة جديدة
                     </a>
                 </div>
-
-                <div class="games-list">
-                    <div class="empty-state">
-                        <i class="fas fa-gamepad"></i>
-                        <h3>لا توجد ألعاب حتى الآن</h3>
-                        <p>ابدأ برفع أول لعبة لك وانشر إبداعاتك للمجتمع</p>
-                        <a href="{{ url_for('upload') }}" class="btn btn-primary">
-                            <i class="fas fa-upload"></i> رفع أول لعبة
-                        </a>
-                    </div>
+                <div class="games-grid">
+                    {% if developer_games %}
+                        {% for game in developer_games %}
+                        <div class="game-card">
+                            <div class="game-thumbnail">
+                                <!-- Add onerror handling to images -->
+                                <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" onerror="this.src="{{ url_for('static', filename='images/logo.png') }}">
+                            </div>
+                            <div class="game-info">
+                                <h3>{{ game.title }}</h3>
+                                <p class="developer">{{ user.username }}</p>
+                                <p class="description">{{ game.short_description }}</p>
+                                <div class="game-meta">
+                                    <div class="rating">
+                                        <i class="fas fa-star"></i> {{ game.rating }}
+                                    </div>
+                                </div>
+                                <div class="game-actions">
+                                    <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="btn btn-small">
+                                        <i class="fas fa-eye"></i> عرض
+                                    </a>
+                                    <button class="btn btn-small btn-secondary" onclick="editGame('{{ game.id }}')">
+                                        <i class="fas fa-edit"></i> تعديل
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-gamepad"></i>
+                            <h3>لا توجد ألعاب حتى الآن</h3>
+                            <p>ابدأ برفع أول لعبة لك وانشر إبداعاتك للمجتمع</p>
+                            <a href="{{ url_for('upload') }}" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> رفع أول لعبة
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
@@ -288,6 +362,22 @@ function showSection(sectionId) {
         document.getElementById('accountSidebar').classList.remove('active');
     }
 }
+
+function shareResume(devId) {
+    const resumeUrl = `{{ url_for('developer_share', dev_id='') }}${devId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'سيرتي الذاتية - SaudiArcade',
+            text: 'تعرف على أعمالي كمطور ألعاب',
+            url: resumeUrl
+        });
+    } else {
+        navigator.clipboard.writeText(resumeUrl);
+        alert('تم نسخ رابط السيرة الذاتية إلى الحافظة');
+    }
+}
+
 
 // Edit profile
 function toggleEdit(section) {
@@ -889,5 +979,64 @@ input:checked + .slider:before {
     background: #2d2d2d !important;
     border: 2px solid #2EC630 !important;
 }
+
+.game-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #b0b0b0;
+    grid-column: 1 / -1;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #2EC630;
+}
+
+.empty-state h3 {
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.developer-resume-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.developer-resume-actions .btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .developer-resume-actions {
+        flex-direction: column;
+    }
+    
+    .developer-resume-actions .btn {
+        width: 100%;
+    }
+}
+
 </style>
 {% endblock %}
