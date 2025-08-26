@@ -34,13 +34,247 @@
       "version": "1.0.0",
       "release_date": "2025-08-24T03:22:20.270449+00:00",
       "rating": 0.0,
-      "downloads": 3,
+      "downloads": 4,
       "status": "published",
       "id": "50ca8ce2-b994-422c-b6d7-45f6d2f0790f",
       "slug": "altima",
       "created_at": "2025-08-24 05:22:20.381499",
-      "updated_at": "2025-08-24 06:56:56.081239"
+      "updated_at": "2025-08-24 14:49:57.929322"
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "games",
+      "description": "games",
+      "short_description": "gamessfsdf",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [
+        "sdfsdf"
+      ],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/games/3d09e95a-2944-4913-916a-3bd6227c48dc/e4e8ad82-4185-4674-8e32-2db61c94fd74/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250824%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250824T164558Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=bdd3f75a7e451b2834359f3ac1cfc7e7345973c80b478e134e7f9ae1745afdcc",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/games/3d09e95a-2944-4913-916a-3bd6227c48dc/68eea48b-148c-4e5c-b7f0-f66f51435b97/files/01JVMVNDK7T0GSJ425C451QABD.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250824%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250824T164558Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=6d2e600bd9085ec3f9d1dd4fdbd3b3f001bf01832a16afea95f95726188bbb41",
+          "filename": "01JVMVNDK7T0GSJ425C451QABD.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-24T16:45:58.419437+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "28467cfa-bd28-4543-9574-be97e35cb8cc",
+      "slug": "games",
+      "created_at": "2025-08-24 19:45:58.436072",
+      "updated_at": "2025-08-24 19:45:58.436072",
+      "price": 0.0
+    },
+    {
+      "game_id": "3ca4c5a8-beff-48b0-9075-5e4eb7c685a5",
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "NewGame",
+      "description": "Game is cool",
+      "short_description": "Game is cool",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/Content/3d09e95a-2944-4913-916a-3bd6227c48dc/3ca4c5a8-beff-48b0-9075-5e4eb7c685a5/thumbnail.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T192524Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=d2641e4e36d9b5b914d6b2f9185f5ad4b6462bd2453511b4870d0073e386a94e",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/Content/3d09e95a-2944-4913-916a-3bd6227c48dc/3ca4c5a8-beff-48b0-9075-5e4eb7c685a5/files/01JVMVNDK7T0GSJ425C451QABD.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T192524Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=cbdb3d748c0dd02ec64f096e2c4e6871a2459c0f56f5d34bf5dd3723dc0d2fa4",
+          "filename": "01JVMVNDK7T0GSJ425C451QABD.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:25:24.639735+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "4e2cff49-8243-4d01-96cb-b584dfc56aa7",
+      "slug": "newgame",
+      "created_at": "2025-08-25 22:25:24.684223",
+      "updated_at": "2025-08-25 22:25:24.684223",
+      "price": 0.0
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "NewGame",
+      "description": "Game is cool",
+      "short_description": "Game is cool",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/NewGame/thumbnail.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T193805Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=078a68d0f6b5d9ffe376fd7fd9a8071293f3fc5ff0f5f8d21e0045ec62eebf6b",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/NewGame/files/501659d7-95a1-4b3f-a057-a33b77667d41_01JVMVNDK7T0GSJ425C451QABD.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T193805Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=2c167d6851888b3753a14c099bf03470c1f6d6a8c4d23b77f929b2ac840372d1",
+          "filename": "501659d7-95a1-4b3f-a057-a33b77667d41_01JVMVNDK7T0GSJ425C451QABD.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:38:05.776109+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "d4b7deaa-4461-4609-bfc9-414ee1cc82f2",
+      "slug": "newgame",
+      "created_at": "2025-08-25 22:38:05.785086",
+      "updated_at": "2025-08-25 22:38:05.785086",
+      "price": 0.0
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "NewGame",
+      "description": "Game is cool",
+      "short_description": "Game is cool",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/NewGame/thumbnail.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T194046Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=a63536651ffde4b4730df3953541858098e09c4107def3413312c099492b9b02",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/NewGame/files/b2f4dc4b-7fc5-475d-841b-04f3c6c70674_BestGame.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T194046Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=ec458ad3a7cc5cf66626d0b448c91aeb6f64c97f8a754a68ac234896c88fab50",
+          "filename": "b2f4dc4b-7fc5-475d-841b-04f3c6c70674_BestGame.zip",
+          "size": 158
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:40:46.087728+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "58554381-4126-4470-b3ef-1b6844c33ba0",
+      "slug": "newgame",
+      "created_at": "2025-08-25 22:40:46.087728",
+      "updated_at": "2025-08-25 22:40:46.087728",
+      "price": 0.0
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "OldGame",
+      "description": "GGGG",
+      "short_description": "GGGG",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/OldGame/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T194240Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=d139ee7c3ec855f5d3defc114a13aa02805bade9f049f28a0668dcdbe415b43e",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/OldGame/files/e6698b40-de57-4148-9259-8679c5cd80e1_BestGame.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T194240Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=634db3cb5f92d04de7116822aec3df72340ecb8839e357c2da34125264a39ecc",
+          "filename": "e6698b40-de57-4148-9259-8679c5cd80e1_BestGame.zip",
+          "size": 158
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:42:40.957911+00:00",
+      "rating": 0.0,
+      "downloads": 1,
+      "status": "published",
+      "id": "31d5467b-eed9-4f56-9e22-278d4ed4f5cf",
+      "slug": "oldgame",
+      "created_at": "2025-08-25 22:42:40.958908",
+      "updated_at": "2025-08-25 22:51:10.510694",
+      "price": 0.0
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "dNowGame",
+      "description": "Worssst",
+      "short_description": "Worssst",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/dNowGame/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T195306Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=13eee96e417261682641eedd559c15d5861cd7df32af1cf8db25810403ef763a",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/dNowGame/files/90c83fae-6669-473c-9c8e-8907f3a88f1f_NowGame.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T195306Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b51452b42e7abb80c275754d0c24fd4c3589df0521c06d487195338c550bd610",
+          "filename": "90c83fae-6669-473c-9c8e-8907f3a88f1f_NowGame.zip",
+          "size": 158
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:53:06.223697+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "4ac5c464-db95-42c6-a006-233662a5dd11",
+      "slug": "dnowgame",
+      "created_at": "2025-08-25 22:53:06.231685",
+      "updated_at": "2025-08-25 22:53:06.231685",
+      "price": 0.0
+    },
+    {
+      "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
+      "developer": "Salam",
+      "title": "wworst",
+      "description": "q3eqw",
+      "short_description": "qweqw",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/wworst/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T195741Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=e1cb880ccb6116666bdd32f4c9bdf43f0f53d5b806244b273d1d9fdb5d9c171b",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/Salam/wworst/files/65a6fdd4-7f71-4c3d-b0c3-6ccde2f69cb5_Helloooo.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250825%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250825T195741Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=e6b88a0a090b6f2ed70856042bbc96ffd7deaa8bbaebe647bd6b09712e26edb5",
+          "filename": "65a6fdd4-7f71-4c3d-b0c3-6ccde2f69cb5_Helloooo.zip",
+          "size": 158
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-25T19:57:41.014139+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "76ed7551-d9fe-4d65-ac08-376cc75edcd3",
+      "slug": "wworst",
+      "created_at": "2025-08-25 22:57:41.022091",
+      "updated_at": "2025-08-25 22:57:41.022091",
+      "price": 0.0
     }
   ],
-  "last_updated": "2025-08-24 06:56:56.081249"
+  "last_updated": "2025-08-25 22:57:41.022091"
 }

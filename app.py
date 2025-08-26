@@ -882,7 +882,6 @@ def developer_share(dev_id):
 @app.route('/download-game/<game_id>')
 @login_required
 def download_game(game_id):
-    """Handle game download"""
     try:
         from games_db import games_db
         game = games_db.get_game_by_id(game_id)
@@ -890,27 +889,31 @@ def download_game(game_id):
         if not game:
             flash('اللعبة غير موجودة', 'error')
             return redirect(url_for('games'))
-        
-        # Check if user owns the game or it's free
-        if game.get('price', 0) > 0:
-            # TODO: Implement purchase verification
-            pass
-        
-        # Increment download count
-        games_db.update_game(game_id, {
-            'downloads': game.get('downloads', 0) + 1
-        })
-        
-        # Redirect to first game file or show download options
-        if game.get('game_files') and len(game['game_files']) > 0:
-            return redirect(game['game_files'][0]['url'])
-        else:
+
+        if not game.get('game_files'):
             flash('لا توجد ملفات متاحة للتحميل', 'error')
             return redirect(url_for('game_details', game_slug=game['slug']))
-            
+
+        main_file = game['game_files'][0]
+        file_key = main_file['key']
+        original_filename = main_file['filename']
+
+        # توليد Presigned URL مع تحديد اسم الملف عند التنزيل
+        download_url = r2_client.generate_presigned_url(
+            'get_object',
+            Params={
+                'Bucket': 'games',       # اسم البكت
+                'Key': file_key,
+                'ResponseContentDisposition': f'attachment; filename="{original_filename}"'
+            },
+            ExpiresIn=3600  # صلاحية الرابط ساعة
+        )
+
+        # إعادة التوجيه مباشرة للرابط
+        return redirect(download_url)
+
     except Exception as e:
-        print(f"Download error: {e}")
-        flash('حدث خطأ أثناء التحميل', 'error')
+        flash(f'حدث خطأ أثناء التحميل: {str(e)}', 'error')
         return redirect(url_for('games'))
 
 # In the upload_game route, remove price references
@@ -927,7 +930,6 @@ def upload_game():
         description = request.form.get('description')
         short_description = request.form.get('short_description')
         category = request.form.get('category')
-        # REMOVE: price = float(request.form.get('price', 0))
         platform = request.form.getlist('platform')
         video_url = request.form.get('video_url')
         features = request.form.getlist('features[]')
@@ -946,10 +948,14 @@ def upload_game():
             flash('يرجى رفع صورة مصغرة وملفات اللعبة', 'error')
             return redirect(url_for('upload'))
         
-        # Upload thumbnail to Cloudflare
+        # تنظيف الاسماء من مسافات او رموز
+        safe_dev_name = current_user.username.replace(" ", "_")
+        safe_title = title.replace(" ", "_")
+        
+        # Upload thumbnail
         thumbnail_data = thumbnail_file.read()
         thumbnail_extension = thumbnail_file.filename.split('.')[-1] if '.' in thumbnail_file.filename else 'png'
-        thumbnail_key = f"games/{current_user.id}/{uuid.uuid4()}/thumbnail.{thumbnail_extension}"
+        thumbnail_key = f"content/{safe_dev_name}/{safe_title}/thumbnail.{thumbnail_extension}"
         
         thumbnail_uploaded = r2_client.upload_file(
             thumbnail_data,
@@ -970,7 +976,9 @@ def upload_game():
                 game_file_data = game_file.read()
                 total_size_bytes += len(game_file_data)
                 
-                game_file_key = f"games/{current_user.id}/{uuid.uuid4()}/files/{game_file.filename}"
+                unique_filename = f"{uuid.uuid4()}_{game_file.filename}"
+                game_file_key = f"content/{safe_dev_name}/{safe_title}/files/{unique_filename}"
+                
                 game_file_uploaded = r2_client.upload_file(
                     game_file_data,
                     game_file_key,
@@ -981,7 +989,7 @@ def upload_game():
                     game_file_url = r2_client.generate_presigned_url(game_file_key)
                     game_file_urls.append({
                         'url': game_file_url,
-                        'filename': game_file.filename,
+                        'filename': unique_filename,
                         'size': len(game_file_data)
                     })
         
@@ -990,7 +998,7 @@ def upload_game():
         for image in additional_images:
             if image.filename:  # Check if file was selected
                 image_data = image.read()
-                image_key = f"games/{current_user.id}/{uuid.uuid4()}/images/{image.filename}"
+                image_key = f"content/{safe_dev_name}/{safe_title}/images/{image.filename}"
                 image_uploaded = r2_client.upload_file(
                     image_data,
                     image_key,
@@ -1012,7 +1020,6 @@ def upload_game():
             'description': description,
             'short_description': short_description,
             'category': category,
-            # REMOVE: 'price': price,
             'platform': platform,
             'video_url': video_url,
             'features': [f for f in features if f],
@@ -1038,12 +1045,8 @@ def upload_game():
             'redirect': url_for('game_details', game_slug=game_data['slug'])
         })
 
-        flash('تم رفع اللعبة بنجاح!', 'success')
-        return redirect(url_for('game_details', game_slug=game_data['slug']))
-        
     except Exception as e:
-        print(f"Error uploading game: {e}")
-        return jsonify({'error': 'حدث خطأ أثناء رفع اللعبة'}), 500
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/games')
 def games():
