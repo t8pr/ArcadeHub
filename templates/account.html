@@ -81,7 +81,7 @@
                         <span id="username-display">{{ user.username }}</span>
                         <input type="text" id="username-edit" name="new_username" value="{{ user.username }}" 
                             class="edit-field" minlength="3" maxlength="20" 
-                            pattern="[a-zA-Z0-9\u0600-\u06FF]+" title="أحرف وأرقام فقط"
+                            pattern="[a-zA-Z0-9_]+" title="أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط"
                             style="display: none;">
                     </div>
                     
@@ -341,6 +341,32 @@
 </div>
 
 <script>
+
+// Form validation
+document.getElementById('username-form').addEventListener('submit', function(e) {
+    const newUsername = document.getElementById('username-edit').value.trim();
+    
+    // Client-side validation - ENGLISH ONLY
+    if (newUsername.length < 3) {
+        e.preventDefault();
+        alert('اسم المستخدم يجب أن يكون 3 أحرف على الأقل');
+        return;
+    }
+    
+    if (newUsername.length > 20) {
+        e.preventDefault();
+        alert('اسم المستخدم يجب أن لا يتجاوز 20 حرف');
+        return;
+    }
+    
+    // English only validation
+    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
+        e.preventDefault();
+        alert('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط');
+        return;
+    }
+});
+
 // Section navigation
 function showSection(sectionId) {
     // Hide all sections

@@ -199,13 +199,13 @@ def register():
         if not email or '@' not in email or '.' not in email:
             errors.append('صيغة البريد الإلكتروني غير صحيحة')
         
-        # Username validation
+        # Username validation - ENGLISH ONLY
         if not username or len(username) < 3:
             errors.append('اسم المستخدم يجب أن يكون 3 أحرف على الأقل')
         elif len(username) > 20:
             errors.append('اسم المستخدم يجب أن لا يتجاوز 20 حرف')
-        elif not username.isalnum():
-            errors.append('اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط')
+        elif not re.match(r'^[a-zA-Z0-9_]+$', username):  # Changed to English only
+            errors.append('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط')
         
         # Password validation
         if len(password) < 8:
@@ -418,7 +418,7 @@ def update_username():
             flash('لم يتم تقديم اسم مستخدم', 'error')
             return redirect(url_for('account') + '#profile')
         
-        # Validation (keep your existing validation)
+        # Validation - ENGLISH ONLY
         if len(new_username) < 3:
             flash('اسم المستخدم يجب أن يكون 3 أحرف على الأقل', 'error')
             return redirect(url_for('account') + '#profile')
@@ -427,8 +427,9 @@ def update_username():
             flash('اسم المستخدم يجب أن لا يتجاوز 20 حرف', 'error')
             return redirect(url_for('account') + '#profile')
         
-        if not re.match(r'^[a-zA-Z0-9\u0600-\u06FF]+$', new_username):
-            flash('اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط', 'error')
+        # Changed to English only (letters, numbers, underscore)
+        if not re.match(r'^[a-zA-Z0-9_]+$', new_username):
+            flash('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط', 'error')
             return redirect(url_for('account') + '#profile')
         
         # Check if username already exists

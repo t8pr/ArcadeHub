@@ -45,10 +45,11 @@
                 <div class="form-group">
                     <label for="username">اسم المستخدم:</label>
                     <input type="text" id="username" name="username" required 
-                           placeholder="اختر اسم مستخدم فريد" minlength="3" maxlength="20"
-                           oninput="checkUsernameAvailability(this.value)">
+                        placeholder="اختر اسم مستخدم فريد (إنجليزي فقط)" minlength="3" maxlength="20"
+                        oninput="checkUsernameAvailability(this.value)"
+                        pattern="[a-zA-Z0-9_]+" title="أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط">
                     <i class="fas fa-user input-icon"></i>
-                    <small class="input-hint">3-20 حرف، مسموح بالأحرف الإنجليزية والأرقام</small>
+                    <small class="input-hint">3-20 حرف، مسموح بالأحرف الإنجليزية والأرقام والشرطة السفلية (_) فقط</small>
                     <div id="username-availability"></div>
                 </div>
 
@@ -115,6 +116,36 @@
 </div>
 
 <script>
+
+// Username validation - English only
+function checkUsernameAvailability(username) {
+    const usernameDiv = document.getElementById('username-availability');
+    
+    if (username.length === 0) {
+        usernameDiv.innerHTML = '';
+        return;
+    }
+    
+    // English only validation
+    const englishRegex = /^[a-zA-Z0-9_]+$/;
+    if (!englishRegex.test(username)) {
+        usernameDiv.innerHTML = '<span style="color: #ff4d4d">✗ مسموح بالأحرف الإنجليزية والأرقام والشرطة السفلية (_) فقط</span>';
+        return;
+    }
+    
+    if (username.length < 3) {
+        usernameDiv.innerHTML = '<span style="color: #ff4d4d">✗ يجب أن يكون 3 أحرف على الأقل</span>';
+        return;
+    }
+    
+    usernameDiv.innerHTML = '<span style="color: #ffcc00">⏳ جاري التحقق...</span>';
+    
+    // Simulate API call
+    setTimeout(() => {
+        usernameDiv.innerHTML = '<span style="color: #4dff4d">✓ صيغة اسم المستخدم صحيحة</span>';
+    }, 1000);
+}
+
 // Password toggle
 function togglePassword(fieldId) {
     const input = document.getElementById(fieldId);
