@@ -2578,6 +2578,82 @@ body.menu-open {
 }
 
 /* Flash messages */
+
+/* Flash Messages */
+.flash-messages {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+}
+
+.flash-message {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    animation: slideIn 0.3s ease;
+    position: relative;
+}
+
+.flash-success {
+    background: #2EC630;
+    color: white;
+    border-left: 5px solid #25a328;
+}
+
+.flash-error {
+    background: #e74c3c;
+    color: white;
+    border-left: 5px solid #c0392b;
+}
+
+.flash-info {
+    background: #3498db;
+    color: white;
+    border-left: 5px solid #2980b9;
+}
+
+.flash-warning {
+    background: #f39c12;
+    color: white;
+    border-left: 5px solid #e67e22;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-left: 15px;
+    font-size: 16px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Make sure flash messages don't interfere with mobile nav */
+@media (max-width: 768px) {
+    .flash-messages {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
 .alert {
     padding: 1rem;
     border-radius: 8px;

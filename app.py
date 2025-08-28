@@ -270,8 +270,8 @@ def register():
             errors.append('اسم المستخدم يجب أن يكون 3 أحرف على الأقل')
         elif len(username) > 20:
             errors.append('اسم المستخدم يجب أن لا يتجاوز 20 حرف')
-        elif not re.match(r'^[a-zA-Z0-9_]+$', username):  # Changed to English only
-            errors.append('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط')
+        elif not re.match(r'^[a-z-0-9_]+$', username):  # Changed to English only
+            errors.append('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية صغيرة وأرقام وشرطة سفلية (_) فقط')
         
         # Password validation
         if len(password) < 8:
@@ -482,28 +482,28 @@ def update_username():
         
         if not new_username:
             flash('لم يتم تقديم اسم مستخدم', 'error')
-            return redirect(url_for('account') + '#profile')
+            return redirect(url_for('account'))
         
         # Validation - ENGLISH ONLY
         if len(new_username) < 3:
             flash('اسم المستخدم يجب أن يكون 3 أحرف على الأقل', 'error')
-            return redirect(url_for('account') + '#profile')
+            return redirect(url_for('account'))
         
         if len(new_username) > 20:
             flash('اسم المستخدم يجب أن لا يتجاوز 20 حرف', 'error')
-            return redirect(url_for('account') + '#profile')
+            return redirect(url_for('account'))
         
         # Changed to English only (letters, numbers, underscore)
-        if not re.match(r'^[a-zA-Z0-9_]+$', new_username):
-            flash('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية وأرقام وشرطة سفلية (_) فقط', 'error')
-            return redirect(url_for('account') + '#profile')
+        if not re.match(r'^[a-z-0-9_]+$', new_username):
+            flash('اسم المستخدم يجب أن يحتوي على أحرف إنجليزية صغيرة وأرقام وشرطة سفلية (_) فقط', 'error')
+            return redirect(url_for('account'))
         
         # Check if username already exists
         existing_user = supabase_client.table('users').select('username').eq('username', new_username).neq('id', current_user.id).execute()
         
         if existing_user.data:
             flash('اسم المستخدم مسجل مسبقاً', 'error')
-            return redirect(url_for('account') + '#profile')
+            return redirect(url_for('account'))
         
         # Update only username (remove slug handling)
         update_response = supabase_client.table('users').update({
@@ -522,7 +522,7 @@ def update_username():
         flash('حدث خطأ في تحديث اسم المستخدم', 'error')
         print(f"Username update error: {e}")
     
-    return redirect(url_for('account') + '#profile')
+    return redirect(url_for('account'))
 
 @app.route('/update-skills', methods=['POST'])
 @login_required

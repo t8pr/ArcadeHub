@@ -393,6 +393,45 @@
 
 <script>
 
+// Handle flash messages when page has hash URL
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if we have flash messages
+    const flashMessages = document.querySelectorAll('.flash-message');
+    
+    if (flashMessages.length > 0) {
+        // Remove any hash from URL to prevent scrolling
+        if (window.location.hash) {
+            // Store the hash for later use
+            const hash = window.location.hash;
+            window.location.hash = '';
+            
+            // Scroll to the section after a short delay to allow flash messages to be seen
+            setTimeout(() => {
+                window.location.hash = hash;
+            }, 100);
+        }
+        
+        // Auto-remove flash messages after 5 seconds
+        flashMessages.forEach(message => {
+            setTimeout(() => {
+                if (message.parentNode) {
+                    message.remove();
+                }
+            }, 5000);
+        });
+    }
+    
+    // If we came from a form submission with a hash, scroll to that section
+    if (window.location.hash) {
+        setTimeout(() => {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
+});
+    
 // Skills management
 
 function validateSkillLevel(input) {
