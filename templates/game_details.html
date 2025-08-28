@@ -15,7 +15,7 @@
             <div class="developer-info">
                 <span>طور بواسطة </span>
                 {% if game.developer_id %}
-                    <a href="{{ url_for('developer_profile', dev_id=game.developer_id) }}" class="developer-link">
+                    <a class="view-profile-btn" href="{{ url_for('developer_profile', username=game.developer) }}">
                         {{ game.developer }}
                     </a>
                 {% else %}
@@ -184,7 +184,7 @@
                 <div class="developer-details">
                     <h3>{{ game.developer }}</h3>
                     <p>مطور ألعاب على منصة SaudiArcade</p>
-                    <a href="{{ url_for('developer_profile', dev_id=game.developer_id) }}" class="view-profile-btn">
+                    <a class="view-profile-btn" href="{{ url_for('developer_profile', username=game.developer) }}">
                         عرض الملف الشخصي
                     </a>
                 </div>

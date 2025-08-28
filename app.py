@@ -162,6 +162,28 @@ def load_user(user_id):
 
 # ===== ROUTES =====
 
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('500.html'), 500
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    return render_template('403.html'), 403
+
+# You can also add a catch-all for other exceptions
+@app.errorhandler(Exception)
+def handle_exception(error):
+    # Log the error
+    print(f"Unhandled exception: {error}")
+    # Return a generic error page
+    return render_template('500.html'), 500
+
+
 @app.template_filter('format_date')
 def format_date_filter(value):
     if isinstance(value, str):
@@ -837,13 +859,33 @@ def upload():
 #     """Remove this entire function"""
 #     pass
 
+def fix_image_urls(game):
+    """Ensure game images have proper URLs"""
+    # Fix thumbnail URL
+    if game.get('thumbnail_url'):
+        if not game['thumbnail_url'].startswith(('http://', 'https://')):
+            game['thumbnail_url'] = r2_client.generate_presigned_url(game['thumbnail_url'])
+    
+    # Fix additional images
+    if game.get('images'):
+        fixed_images = []
+        for image in game['images']:
+            if not image.startswith(('http://', 'https://')):
+                fixed_images.append(r2_client.generate_presigned_url(image))
+            else:
+                fixed_images.append(image)
+        game['images'] = fixed_images
+    
+    return game
+
 # Update the developer_profile route
-@app.route('/developer/<dev_id>')
-def developer_profile(dev_id):
+# Replace the existing developer_profile route with this:
+@app.route('/developer/<username>')
+def developer_profile(username):
     """Developer profile page - only accessible for developers"""
     try:
-        # First check if the user is actually a developer
-        response = supabase_client.table('users').select('account_type').eq('id', dev_id).execute()
+        # Get developer info from Supabase by username
+        response = supabase_client.table('users').select('*').eq('username', username).execute()
         
         if not response.data:
             return render_template('404.html'), 404
@@ -857,23 +899,33 @@ def developer_profile(dev_id):
         from games_db import games_db
         
         # Get developer games from local database
-        developer_games = games_db.get_developer_games(dev_id)
+        developer_games = games_db.get_developer_games(user_data['id'])
         
-        # Get developer info from Supabase
-        response = supabase_client.table('users').select('*').eq('id', dev_id).execute()
-        if response.data:
-            user_data = response.data[0]
-            developer_info = {
-                'id': dev_id,
-                'username': user_data.get('username', 'مطور ألعاب'),
-                'email': user_data.get('email', ''),
-                'join_date': user_data.get('created_at', '2024-01-01'),
-                'account_type': user_data.get('account_type', 'developer'),
-                'social_media': user_data.get('social_media', {})
-            }
-        else:
-            # If user not found, show 404
-            return render_template('404.html'), 404
+        # Fix image URLs for games
+        for game in developer_games:
+            # Ensure thumbnail_url is properly formatted
+            if game.get('thumbnail_url') and not game['thumbnail_url'].startswith(('http://', 'https://')):
+                game['thumbnail_url'] = r2_client.generate_presigned_url(game['thumbnail_url'])
+            
+            # Fix image URLs if they're stored as keys
+            if game.get('images'):
+                fixed_images = []
+                for image in game['images']:
+                    if not image.startswith(('http://', 'https://')):
+                        # If it's a key, generate a presigned URL
+                        fixed_images.append(r2_client.generate_presigned_url(image))
+                    else:
+                        fixed_images.append(image)
+                game['images'] = fixed_images
+        
+        developer_info = {
+            'id': user_data['id'],
+            'username': user_data.get('username', 'مطور ألعاب'),
+            'email': user_data.get('email', ''),
+            'join_date': user_data.get('created_at', '2024-01-01'),
+            'account_type': user_data.get('account_type', 'developer'),
+            'social_media': user_data.get('social_media', {})
+        }
         
         # Add stats to developer info
         developer_info.update({
@@ -889,7 +941,22 @@ def developer_profile(dev_id):
     except Exception as e:
         print(f"Error loading developer profile: {e}")
         return render_template('404.html'), 404
-
+    
+@app.route('/developer/<dev_id>')
+def legacy_developer_profile(dev_id):
+    """Redirect old UUID-based developer URLs to username-based ones"""
+    try:
+        # Get user data by ID
+        response = supabase_client.table('users').select('username').eq('id', dev_id).execute()
+        
+        if response.data:
+            username = response.data[0]['username']
+            return redirect(url_for('developer_profile', username=username))
+        else:
+            return render_template('404.html'), 404
+    except Exception as e:
+        print(f"Error redirecting legacy developer URL: {e}")
+        return render_template('404.html'), 404
 
 @app.route('/developer/<dev_id>/share')
 def developer_share(dev_id):

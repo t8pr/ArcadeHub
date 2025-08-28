@@ -34,7 +34,7 @@
                 </a>
                 
                 {% if user.is_developer() %}
-                <a class="menu-item" target="_blank" href="{{ url_for('developer_profile', dev_id=user.id) }}">
+                <a class="menu-item" target="_blank" href="{{ url_for('developer_profile', username=current_user.username) }}">
                     <i class="fas fa-file-alt"></i>
                     <span>عرض السيرة الذاتية</span>
                 </a>
@@ -289,8 +289,12 @@
                         {% for game in developer_games %}
                         <div class="game-card">
                             <div class="game-thumbnail">
-                                <!-- Add onerror handling to images -->
-                                <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" onerror="this.src="{{ url_for('static', filename='images/logo.png') }}">
+                                {% if game.thumbnail_url %}
+                                <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" 
+                                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/default-game.png') }}'">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-game.png') }}" alt="{{ game.title }}">
+                                {% endif %}
                             </div>
                             <div class="game-info">
                                 <h3>{{ game.title }}</h3>

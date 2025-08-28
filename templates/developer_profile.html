@@ -230,8 +230,7 @@
         <h3><i class="fas fa-share-alt"></i> مشاركة ملف المطور</h3>
         <p>انسخ الرابط أدناه لمشاركته:</p>
         <div class="share-link">
-            <input type="text" id="shareUrl" readonly value="{{ url_for('developer_share', dev_id=developer.id, _external=True) }}">
-            <button onclick="copyShareLink()">
+        <input type="text" id="shareUrl" readonly value="{{ url_for('developer_profile', username=developer.username, _external=True) }}">            <button onclick="copyShareLink()">
                 <i class="fas fa-copy"></i>
             </button>
         </div>
@@ -308,7 +307,7 @@ function fallbackCopyToClipboard(text) {
 
 function shareDeveloper() {
     // Get the current profile URL (without any hash or query parameters)
-    const profileUrl = window.location.origin + "{{ url_for('developer_profile', dev_id=developer.id) }}";
+    const profileUrl = window.location.origin + "{{ url_for('developer_profile', username=developer.username) }}";
     
     // Use the modern Clipboard API if available
     if (navigator.clipboard && window.isSecureContext) {
@@ -325,6 +324,23 @@ function shareDeveloper() {
     }
 }
 
+function shareOnTwitter() {
+    const url = encodeURIComponent('{{ url_for("developer_profile", username=developer.username, _external=True) }}');
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function shareOnLinkedIn() {
+    const url = encodeURIComponent('{{ url_for("developer_profile", username=developer.username, _external=True) }}');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+}
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    const url = encodeURIComponent('{{ url_for("developer_profile", username=developer.username, _external=True) }}');
+    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+}
+
 function closeShareModal() {
     document.getElementById('shareModal').style.display = 'none';
 }
@@ -335,22 +351,6 @@ function copyShareLink() {
     document.execCommand('copy');
 }
 
-function shareOnTwitter() {
-    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
-    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-}
-
-function shareOnLinkedIn() {
-    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
-}
-
-function shareOnWhatsApp() {
-    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
-    const url = encodeURIComponent('{{ url_for("developer_share", dev_id=developer.id, _external=True) }}');
-    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-}
 
 // Contact functionality
 function contactDeveloper() {
