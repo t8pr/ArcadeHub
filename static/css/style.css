@@ -169,6 +169,16 @@ footer {
     flex-direction: column;
 }
 
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.feature-box:hover::before {
+    opacity: 0.1;
+}
+
+
 .feature-box.large {
     grid-column: span 2;
     min-height: 250px;
@@ -2717,6 +2727,8 @@ body.menu-open {
     color: #2EC630;
 }
 
+
+
 .social-media-form input {
     width: 100%;
     padding: 0.8rem;
@@ -2769,4 +2781,33 @@ body.menu-open {
     font-weight: bold;
     border-radius: 4px;
     z-index: 1000;
+}
+
+.beta-banner {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #E91E63;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transform: rotate(3deg);
+    transition: transform 0.3s ease;
+}
+
+.beta-banner:hover {
+    transform: rotate(-1deg) scale(1.05);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .beta-banner {
+        font-size: 15px;
+        right: 10px;
+        top: 95px;
+    }
 }

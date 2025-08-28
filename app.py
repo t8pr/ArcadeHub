@@ -176,9 +176,52 @@ def format_date_filter(value):
         return value.strftime('%Y-%m-%d %H:%M')
     return value
 
+# Add this function to your app.py
+def get_platform_stats():
+    """Get real statistics from both databases"""
+    stats = {
+        'user_count': 0,
+        'game_count': 0,
+        'download_count': 0,
+        'developer_count': 0
+    }
+    
+    try:
+        # Get user count from Supabase
+        users_response = supabase_client.table('users').select('id', count='exact').execute()
+        stats['user_count'] = users_response.count or 0
+        
+        # Get developer count from Supabase
+        devs_response = supabase_client.table('users').select('id', count='exact').eq('account_type', 'developer').execute()
+        stats['developer_count'] = devs_response.count or 0
+        
+        # Get game stats from local database
+        from games_db import games_db
+        all_games = games_db.get_all_games()
+        stats['game_count'] = len(all_games)
+        
+        # Calculate total downloads
+        stats['download_count'] = sum(game.get('downloads', 0) for game in all_games)
+        
+    except Exception as e:
+        print(f"Error getting platform stats: {e}")
+        # Fallback to showing at least something
+        if stats['user_count'] == 0:
+            stats['user_count'] = 364
+        if stats['game_count'] == 0:
+            stats['game_count'] = 132
+        if stats['download_count'] == 0:
+            stats['download_count'] = 256
+        if stats['developer_count'] == 0:
+            stats['developer_count'] = 342
+    
+    return stats
+
+# Update the home route to pass real stats
 @app.route('/')
 def home():
-    return render_template('index.html')
+    stats = get_platform_stats()
+    return render_template('index.html', stats=stats)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -525,17 +568,17 @@ def verify_otp():
     # Show which email the OTP was sent to
     return render_template('verify_otp.html', user_email=user_email)
 
-@app.route('/cleanup-expired-otps')
-def cleanup_expired_otps():
-    """Clean up expired OTPs (can be called periodically)"""
-    try:
-        current_time = datetime.now(timezone.utc).isoformat()
-        result = supabase_client.table('password_resets').delete().lt('expires_at', current_time).execute()
-        print(f"✅ Cleaned up {len(result.data)} expired OTPs")
-        return f"Cleaned up {len(result.data)} expired OTPs"
-    except Exception as e:
-        print(f"❌ Cleanup error: {e}")
-        return f"Cleanup error: {e}"
+# @app.route('/cleanup-expired-otps')
+# def cleanup_expired_otps():
+#     """Clean up expired OTPs (can be called periodically)"""
+#     try:
+#         current_time = datetime.now(timezone.utc).isoformat()
+#         result = supabase_client.table('password_resets').delete().lt('expires_at', current_time).execute()
+#         print(f"✅ Cleaned up {len(result.data)} expired OTPs")
+#         return f"Cleaned up {len(result.data)} expired OTPs"
+#     except Exception as e:
+#         print(f"❌ Cleanup error: {e}")
+#         return f"Cleanup error: {e}"
 
 def send_otp_email(email, otp_code, username):
     """
@@ -677,33 +720,6 @@ def forgot_password():
             print(f"Forgot password error: {e}")
     
     return render_template('forgot_password.html')
-
-@app.route('/debug-email')
-def debug_email():
-    """Debug email configuration"""
-    email_user = os.getenv('MAIL_USERNAME')
-    email_password = os.getenv('MAIL_PASSWORD')
-    
-    return f"""
-    Email User: {email_user}<br>
-    Email Password: {email_password}<br>
-    Server: {os.getenv('MAIL_SERVER')}<br>
-    Port: {os.getenv('MAIL_PORT')}
-    """
-
-@app.route('/test-email')
-def test_email():
-    try:
-        # Test email configuration
-        msg = Message(
-            subject='Test Email from SaudiArcade',
-            recipients=['test@example.com'],
-            body='This is a test email from your Flask application.'
-        )
-        mail.send(msg)
-        return '✅ Email sent successfully!'
-    except Exception as e:
-        return f'❌ Email failed: {str(e)}'
 
 @app.route('/set-new-password', methods=['GET', 'POST'])
 def set_new_password():

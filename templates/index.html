@@ -84,6 +84,14 @@
     </main>
 
     <script>
+    // Get the real stats from the server
+    const realStats = {
+        userCount: {{ stats.user_count }},
+        gameCount: {{ stats.game_count }},
+        downloadCount: {{ stats.download_count }},
+        developerCount: {{ stats.developer_count }}
+    };
+
     // Animated counter for status bar
     function animateCounter(element, finalValue, duration = 2000) {
         const start = 0;
@@ -102,10 +110,10 @@
 
     // Start counters when page loads
     window.addEventListener('load', () => {
-        animateCounter(document.getElementById('userCount'), 12453);
-        animateCounter(document.getElementById('gameCount'), 876);
-        animateCounter(document.getElementById('downloadCount'), 54231);
-        animateCounter(document.getElementById('developerCount'), 342);
+        animateCounter(document.getElementById('userCount'), realStats.userCount);
+        animateCounter(document.getElementById('gameCount'), realStats.gameCount);
+        animateCounter(document.getElementById('downloadCount'), realStats.downloadCount);
+        animateCounter(document.getElementById('developerCount'), realStats.developerCount);
     });
     </script>
 {% endblock %}
