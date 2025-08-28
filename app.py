@@ -105,13 +105,14 @@ except Exception as e:
     supabase_client = None
 
 class User(UserMixin):
-    def __init__(self, id, email, username, account_type, created_at=None, social_media=None):
+    def __init__(self, id, email, username, account_type, created_at=None, social_media=None, skills=None):
         self.id = id
         self.email = email
         self.username = username
         self.account_type = account_type
         self.created_at = created_at
         self.social_media = social_media or {}
+        self.skills = skills or []  # Add skills field
     
     def is_developer(self):
         return self.account_type == 'developer'
@@ -122,9 +123,9 @@ def load_user(user_id):
         return None
         
     try:
-        # Get user without slug column
+        # Get user with skills column
         response = supabase_client.table('users').select(
-            'id, email, username, account_type, created_at, social_media'
+            'id, email, username, account_type, created_at, social_media, skills'
         ).eq('id', user_id).execute()
         
         if response.data:
@@ -135,11 +136,12 @@ def load_user(user_id):
                 username=user_data['username'],
                 account_type=user_data['account_type'],
                 created_at=user_data.get('created_at'),
-                social_media=user_data.get('social_media', {})
+                social_media=user_data.get('social_media', {}),
+                skills=user_data.get('skills', [])  # Include skills
             )
     except Exception as e:
         print(f"Error loading user: {e}")
-        # Fallback without social_media
+        # Fallback without social_media and skills
         try:
             response = supabase_client.table('users').select(
                 'id, email, username, account_type, created_at'
@@ -158,7 +160,6 @@ def load_user(user_id):
             print(f"Error loading user without social_media: {inner_e}")
     
     return None
-
 
 # ===== ROUTES =====
 
@@ -522,6 +523,164 @@ def update_username():
         print(f"Username update error: {e}")
     
     return redirect(url_for('account') + '#profile')
+
+@app.route('/update-skills', methods=['POST'])
+@login_required
+def update_skills():
+    if not current_user.is_developer():
+        flash('يجب أن تكون مطوراً لتعديل المهارات', 'error')
+        return redirect(url_for('account'))
+    
+    try:
+        # Get skills from form data
+        skills_data = request.form.get('skills')
+        
+        if not skills_data:
+            flash('لم يتم تقديم أي مهارات', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        # Parse skills (expecting JSON format)
+        try:
+            skills_list = json.loads(skills_data)
+        except json.JSONDecodeError:
+            flash('صيغة المهارات غير صحيحة', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        # Validate skills structure
+        if not isinstance(skills_list, list):
+            flash('يجب أن تكون المهارات في شكل قائمة', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        # Validate each skill
+        valid_skills = []
+        for skill in skills_list:
+            if not isinstance(skill, dict):
+                continue
+                
+            name = skill.get('name', '').strip()
+            level = skill.get('level', 0)
+            
+            # Validate skill name
+            if not name:
+                continue
+                
+            # Validate skill level (0-100)
+            try:
+                level = int(level)
+                if level < 0:
+                    level = 0
+                elif level > 100:
+                    level = 100
+            except (ValueError, TypeError):
+                level = 0
+            
+            valid_skills.append({
+                'name': name,
+                'level': level
+            })
+        
+        # Update skills in database
+        update_response = supabase_client.table('users').update({
+            'skills': valid_skills,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.skills = valid_skills
+            flash('تم تحديث المهارات بنجاح', 'success')
+        else:
+            flash('فشل في تحديث المهارات', 'error')
+            
+    except Exception as e:
+        flash('حدث خطأ في تحديث المهارات', 'error')
+        print(f"Skills update error: {e}")
+    
+    return redirect(url_for('account') + '#skills')
+
+@app.route('/delete-skills', methods=['POST'])
+@login_required
+def delete_skills():
+    if not current_user.is_developer():
+        flash('يجب أن تكون مطوراً لإدارة المهارات', 'error')
+        return redirect(url_for('account'))
+    
+    try:
+        # Get skill index to delete from form data
+        skill_index = request.form.get('skill_index')
+        
+        if skill_index is None:
+            flash('لم يتم تحديد المهارة للحذف', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        # Get current skills
+        response = supabase_client.table('users').select('skills').eq('id', current_user.id).execute()
+        
+        if not response.data:
+            flash('المستخدم غير موجود', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        current_skills = response.data[0].get('skills', [])
+        
+        # Convert skill_index to integer and validate
+        try:
+            index = int(skill_index)
+            if index < 0 or index >= len(current_skills):
+                flash('رقم المهارة غير صحيح', 'error')
+                return redirect(url_for('account') + '#skills')
+        except ValueError:
+            flash('رقم المهارة غير صحيح', 'error')
+            return redirect(url_for('account') + '#skills')
+        
+        # Remove the skill at the specified index
+        updated_skills = current_skills.copy()
+        del updated_skills[index]
+        
+        # Update skills in database
+        update_response = supabase_client.table('users').update({
+            'skills': updated_skills,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.skills = updated_skills
+            flash('تم حذف المهارة بنجاح', 'success')
+        else:
+            flash('فشل في حذف المهارة', 'error')
+            
+    except Exception as e:
+        flash('حدث خطأ في حذف المهارة', 'error')
+        print(f"Skills deletion error: {e}")
+    
+    return redirect(url_for('account') + '#skills')
+
+@app.route('/clear-skills', methods=['POST'])
+@login_required
+def clear_skills():
+    if not current_user.is_developer():
+        flash('يجب أن تكون مطوراً لإدارة المهارات', 'error')
+        return redirect(url_for('account'))
+    
+    try:
+        # Update skills to empty array
+        update_response = supabase_client.table('users').update({
+            'skills': [],
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.skills = []
+            flash('تم حذف جميع المهارات بنجاح', 'success')
+        else:
+            flash('فشل في حذف المهارات', 'error')
+            
+    except Exception as e:
+        flash('حدث خطأ في حذف المهارات', 'error')
+        print(f"Skills clearance error: {e}")
+    
+    return redirect(url_for('account') + '#skills')
 
 @app.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
@@ -924,7 +1083,8 @@ def developer_profile(username):
             'email': user_data.get('email', ''),
             'join_date': user_data.get('created_at', '2024-01-01'),
             'account_type': user_data.get('account_type', 'developer'),
-            'social_media': user_data.get('social_media', {})
+            'social_media': user_data.get('social_media', {}),
+            'skills': user_data.get('skills', [])  # Include skills
         }
         
         # Add stats to developer info

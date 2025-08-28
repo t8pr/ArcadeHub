@@ -98,7 +98,6 @@
                     
                 </div>
             </div>
-
             <!-- Skills Section -->
             <div class="detail-card">
                 <h3><i class="fas fa-code"></i> المهارات التقنية</h3>
@@ -106,34 +105,18 @@
                     {% if developer.skills %}
                         {% for skill in developer.skills %}
                         <div class="skill-item">
-                            <span class="skill-name">{{ skill.name if skill.name else skill }}</span>
+                            <span class="skill-name">{{ skill.name }}</span>
                             <div class="skill-level">
-                                <div class="skill-progress" style="width: {{ skill.level if skill.level else '70' }}%;"></div>
+                                {% set level = skill.level if skill.level <= 100 else 100 %}
+                                <div class="skill-progress" style="width: {{ level }}%;"></div>
                             </div>
-                            <span class="skill-percentage">{{ skill.level if skill.level else '70' }}%</span>
+                            <span class="skill-percentage">{{ level }}%</span>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="skill-item">
-                            <span class="skill-name">Unity</span>
-                            <div class="skill-level">
-                                <div class="skill-progress" style="width: 85%;"></div>
-                            </div>
-                            <span class="skill-percentage">85%</span>
-                        </div>
-                        <div class="skill-item">
-                            <span class="skill-name">C#</span>
-                            <div class="skill-level">
-                                <div class="skill-progress" style="width: 78%;"></div>
-                            </div>
-                            <span class="skill-percentage">78%</span>
-                        </div>
-                        <div class="skill-item">
-                            <span class="skill-name">Game Design</span>
-                            <div class="skill-level">
-                                <div class="skill-progress" style="width: 90%;"></div>
-                            </div>
-                            <span class="skill-percentage">90%</span>
+                        <div class="no-skills">
+                            <i class="fas fa-info-circle"></i>
+                            <p>لم يقم المطور بإضافة مهارات بعد</p>
                         </div>
                     {% endif %}
                 </div>
@@ -176,7 +159,8 @@
     </div>
 
     <!-- Developer Games -->
-    <div class="developer-games-section">
+    <div class="container">
+            <div class="developer-games-section">
         <div class="section-header">
             <h2><i class="fas fa-gamepad"></i> ألعاب المطور</h2>
             <span class="games-count">{{ games|length }} لعبة</span>
@@ -221,6 +205,7 @@
             <p>هذا المطور لم يقم برفع أي ألعاب بعد</p>
         </div>
         {% endif %}
+    </div>
     </div>
 
 <!-- Share Modal -->
@@ -565,6 +550,7 @@ window.onclick = function(event) {
     padding: 2rem;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
+    margin: 1pc;
 }
 
 .detail-card:hover {

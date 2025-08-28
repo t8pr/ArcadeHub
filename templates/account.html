@@ -210,7 +210,7 @@
 
             <div class="settings-content">
                 <!-- Notification Settings -->
-                <div class="setting-item">
+                <!-- <div class="setting-item">
                     <div class="setting-info">
                         <h4>🔔 الإشعارات</h4>
                         <p>استقبال إشعارات حول الألعاب الجديدة والتحديثات</p>
@@ -230,10 +230,57 @@
                         <input type="checkbox" {{ 'checked' if user.is_developer() else '' }}>
                         <span class="slider"></span>
                     </label>
-                </div>
+                </div> -->
                 
                 <!-- Social Media Settings (for developers only) -->
                 {% if user.is_developer() %}
+                <!-- Add this to your account.html template -->
+                <div id="skills" class="settings-section">
+                    <h3><i class="fas fa-code"></i> المهارات التقنية</h3>
+                    
+                    <div class="skills-manager">
+                        <div id="skillsContainer">
+                            <!-- For existing skills -->
+                            {% if current_user.skills %}
+                                {% for skill in current_user.skills %}
+                                <div class="skill-input-group">
+                                    <input type="text" name="skill_name" placeholder="اسم المهارة" value="{{ skill.name }}" class="skill-name">
+                                    <input type="number" name="skill_level" placeholder="المستوى (0-100)" min="0" max="100" 
+                                        value="{{ skill.level }}" class="skill-level" oninput="validateSkillLevel(this)">
+                                    <button type="button" class="btn-remove-skill" onclick="removeSkill(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="skill-input-group">
+                                    <input type="text" name="skill_name" placeholder="اسم المهارة" class="skill-name">
+                                    <input type="number" name="skill_level" placeholder="المستوى (0-100)" min="0" max="100" 
+                                        class="skill-level" oninput="validateSkillLevel(this)">
+                                    <button type="button" class="btn-remove-skill" onclick="removeSkill(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="button" class="btn-add-skill" onclick="addSkill()">
+                            <i class="fas fa-plus"></i> إضافة مهارة
+                        </button>
+                        <form method="POST" action="{{ url_for('update_skills') }}" class="skills-form">
+                            <input type="hidden" name="skills" id="skillsData">
+                            <button type="submit" class="btn-save-skills">
+                                <i class="fas fa-save"></i> حفظ المهارات
+                            </button>
+                        </form>
+                        
+                        <!-- Delete skill form (hidden) -->
+                        <form method="POST" action="{{ url_for('delete_skills') }}" id="deleteSkillForm" style="display: none;">
+                            <input type="hidden" name="skill_index" id="deleteSkillIndex">
+                        </form>
+                    </div>
+                </div>
                 <div class="setting-item social-media-settings">
                     <div class="setting-info">
                         <h4>🌐 وسائل التواصل الاجتماعي</h4>
@@ -346,6 +393,98 @@
 
 <script>
 
+// Skills management
+
+function validateSkillLevel(input) {
+    if (input.value > 100) {
+        input.value = 100;
+        showSkillLevelWarning('لا يمكن أن يتجاوز مستوى المهارة 100%');
+    } else if (input.value < 0) {
+        input.value = 0;
+        showSkillLevelWarning('لا يمكن أن يكون مستوى المهارة أقل من 0%');
+    }
+}
+
+function showSkillLevelWarning(message) {
+    // Remove any existing warning
+    const existingWarning = document.getElementById('skillLevelWarning');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+    
+    // Create warning element
+    const warning = document.createElement('div');
+    warning.id = 'skillLevelWarning';
+    warning.textContent = message;
+    warning.style.color = '#e74c3c';
+    warning.style.marginTop = '0.5rem';
+    warning.style.padding = '0.5rem';
+    warning.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+    warning.style.borderRadius = '4px';
+    warning.style.border = '1px solid #e74c3c';
+    
+    // Insert after the skills container
+    const skillsContainer = document.getElementById('skillsContainer');
+    skillsContainer.parentNode.insertBefore(warning, skillsContainer.nextSibling);
+    
+    // Remove warning after 3 seconds
+    setTimeout(() => {
+        if (warning.parentNode) {
+            warning.parentNode.removeChild(warning);
+        }
+    }, 3000);
+}
+
+function addSkill() {
+    const container = document.getElementById('skillsContainer');
+    const newSkill = document.createElement('div');
+    newSkill.className = 'skill-input-group';
+    newSkill.innerHTML = `
+        <input type="text" name="skill_name" placeholder="اسم المهارة" class="skill-name">
+        <input type="number" name="skill_level" placeholder="المستوى (0-100)" min="0" max="100" 
+               class="skill-level" oninput="validateSkillLevel(this)">
+        <button type="button" class="btn-remove-skill" onclick="removeSkill(this)">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(newSkill);
+}
+
+function removeSkill(button) {
+    const container = document.getElementById('skillsContainer');
+    if (container.children.length > 1) {
+        button.parentElement.remove();
+    } else {
+        // If it's the last skill, just clear the inputs
+        const group = button.parentElement;
+        group.querySelector('.skill-name').value = '';
+        group.querySelector('.skill-level').value = '';
+    }
+}
+
+// Prepare skills data before form submission
+document.querySelector('.skills-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const skills = [];
+    const skillGroups = document.querySelectorAll('.skill-input-group');
+    
+    skillGroups.forEach(group => {
+        const name = group.querySelector('.skill-name').value.trim();
+        const level = group.querySelector('.skill-level').value;
+        
+        if (name && level) {
+            skills.push({
+                name: name,
+                level: parseInt(level)
+            });
+        }
+    });
+    
+    document.getElementById('skillsData').value = JSON.stringify(skills);
+    this.submit();
+});
+    
 // Form validation
 document.getElementById('username-form').addEventListener('submit', function(e) {
     const newUsername = document.getElementById('username-edit').value.trim();
@@ -570,6 +709,182 @@ document.getElementById('confirm-new-password').addEventListener('input', functi
 </script>
 
 <style>
+
+.skill-level:invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+}
+
+.skill-level:valid {
+    border-color: #2EC630;
+    box-shadow: 0 0 5px rgba(46, 198, 48, 0.3);
+}
+
+.skill-level:focus:invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.7);
+}
+
+.skill-level:focus:valid {
+    border-color: #2EC630;
+    box-shadow: 0 0 8px rgba(46, 198, 48, 0.5);
+}
+
+.skill-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.skill-name, .skill-level {
+    padding: 0.5rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #2d2d2d;
+    color: #f0f0f0;
+}
+
+.skill-name {
+    flex: 2;
+}
+
+.skill-level {
+    flex: 1;
+    max-width: 100px;
+}
+
+.btn-remove-skill, .btn-delete-skill {
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-skill {
+    background: #e67e22;
+}
+
+.btn-delete-skill {
+    background: #e74c3c;
+}
+
+.btn-remove-skill:hover {
+    background: #d35400;
+}
+
+.btn-delete-skill:hover {
+    background: #c0392b;
+}
+
+.btn-add-skill {
+    background: #2EC630;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.btn-save-skills {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.no-skills {
+    text-align: center;
+    color: #8f8f8f;
+    padding: 1rem;
+}
+
+.no-skills i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.skills-manager {
+    margin: 1rem 0;
+}
+
+.skill-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.skill-name, .skill-level {
+    padding: 0.5rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #2d2d2d;
+    color: #f0f0f0;
+}
+
+.skill-name {
+    flex: 1;
+}
+
+.skill-level {
+    flex: 1;
+    max-width: 100%;
+}
+
+.btn-remove-skill {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-add-skill {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.btn-save-skills {
+    background: #2EC630;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.no-skills {
+    text-align: center;
+    color: #8f8f8f;
+    padding: 1rem;
+}
+
+.no-skills i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
 /* Responsive Account Styles */
 .account-container {
     min-height: 100vh;
