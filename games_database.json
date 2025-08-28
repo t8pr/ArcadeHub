@@ -274,7 +274,46 @@
       "created_at": "2025-08-25 22:57:41.022091",
       "updated_at": "2025-08-25 22:57:41.022091",
       "price": 0.0
+    },
+    {
+      "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
+      "developer": "OsamaAlhamdan",
+      "title": "Altoto",
+      "description": "Hard Driver",
+      "short_description": "Zgane",
+      "category": "adventure",
+      "platform": [
+        "windows",
+        "mac",
+        "web"
+      ],
+      "video_url": "",
+      "features": [
+        "القوه",
+        "الغضب",
+        "السرعة"
+      ],
+      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/OsamaAlhamdan/Altoto/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250826%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250826T154952Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=1c319335fc4c6e157419f6fcbc11b532ea89b9a7912201eebfa1c8a823f77ecb",
+      "game_files": [
+        {
+          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/OsamaAlhamdan/Altoto/files/4c240f75-1d15-4aa2-98b9-d730cfe12720_GoogleCloudSDKInstaller.exe?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250826%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250826T154952Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=4da62476e5f8a91b29a548ca4da11e2329ab3664ae6b83b1f2caee39785c151b",
+          "filename": "4c240f75-1d15-4aa2-98b9-d730cfe12720_GoogleCloudSDKInstaller.exe",
+          "size": 267328
+        }
+      ],
+      "images": [],
+      "size": "0.25 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-26T15:49:52.803387+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "303c9841-6fa6-49b5-b521-9394e0d84a1b",
+      "slug": "altoto",
+      "created_at": "2025-08-26 17:49:52.925010",
+      "updated_at": "2025-08-26 17:49:52.925019",
+      "price": 0.0
     }
   ],
-  "last_updated": "2025-08-25 22:57:41.022091"
+  "last_updated": "2025-08-26 17:49:52.925025"
 }
