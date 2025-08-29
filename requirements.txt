@@ -6,3 +6,4 @@ werkzeug==2.3.7
 boto3==1.28.62
 botocore==1.31.62
 requests==2.31.0
+gunicorn==21.2.0
