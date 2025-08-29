@@ -21,6 +21,7 @@ from cloudflare_utils import CloudflareR2, r2_client  # ← Import the r2_client
 import io
 from games_db import games_db
 from werkzeug.utils import secure_filename
+import arabic_reshaper
 # Load environment variables
 load_dotenv()
 
