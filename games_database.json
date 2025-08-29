@@ -313,7 +313,139 @@
       "created_at": "2025-08-26 17:49:52.925010",
       "updated_at": "2025-08-26 17:49:52.925019",
       "price": 0.0
+    },
+    {
+      "developer_id": "d0a88c96-26ee-4f48-b425-eafd05c8ada7",
+      "developer": "badrdev",
+      "title": "zgzgzgzg",
+      "description": "zgzgzgzg",
+      "short_description": "zgzgzgzg",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://games.f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/content/badrdev/zgzgzgzg/thumbnail.png",
+      "game_files": [
+        {
+          "url": "https://games.f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/content/badrdev/zgzgzgzg/files/a893464f-3d03-48ec-b878-232737e11e88_TestGame.zip",
+          "filename": "a893464f-3d03-48ec-b878-232737e11e88_TestGame.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-29T17:14:49.461285+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "b0d90544-b8e2-4ef5-b383-a8fc5620eafa",
+      "slug": "zgzgzgzg",
+      "created_at": "2025-08-29 20:14:49.511202",
+      "updated_at": "2025-08-29 20:14:49.511202",
+      "price": 0.0
+    },
+    {
+      "developer_id": "d0a88c96-26ee-4f48-b425-eafd05c8ada7",
+      "developer": "badrdev",
+      "title": "new zg",
+      "description": "new zg",
+      "short_description": "new zg",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://games.f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/content/badrdev/new_zg/thumbnail.png",
+      "game_files": [
+        {
+          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/badrdev/new_zg/files/05a1fb26-9438-48cd-be78-3a6f8988241f_TestGame.zip",
+          "filename": "05a1fb26-9438-48cd-be78-3a6f8988241f_TestGame.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-29T17:26:04.592070+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "8e3748c0-1358-4962-8f9c-3825d9bd8855",
+      "slug": "new-zg",
+      "created_at": "2025-08-29 20:26:04.600049",
+      "updated_at": "2025-08-29 20:26:04.600049",
+      "price": 0.0
+    },
+    {
+      "developer_id": "d0a88c96-26ee-4f48-b425-eafd05c8ada7",
+      "developer": "badrdev",
+      "title": "last zg",
+      "description": "last zg",
+      "short_description": "last zg",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/badrdev/last_zg/thumbnail.png",
+      "game_files": [
+        {
+          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/badrdev/last_zg/files/169fee4b-b40e-4245-926d-cdc42b2bd834_TestGame.zip",
+          "filename": "169fee4b-b40e-4245-926d-cdc42b2bd834_TestGame.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-29T17:30:23.362871+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "18f8faa5-d445-4b95-9263-bfbaf78a1458",
+      "slug": "last-zg",
+      "created_at": "2025-08-29 20:30:23.372416",
+      "updated_at": "2025-08-29 20:30:23.372416",
+      "price": 0.0
+    },
+    {
+      "developer_id": "d0a88c96-26ee-4f48-b425-eafd05c8ada7",
+      "developer": "badrdev",
+      "title": "Last Test",
+      "description": "Last Test",
+      "short_description": "Last Test",
+      "category": "action",
+      "platform": [
+        "windows"
+      ],
+      "video_url": "",
+      "features": [],
+      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/badrdev/Last_Test/thumbnail.png",
+      "game_files": [
+        {
+          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/badrdev/Last_Test/files/96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
+          "filename": "96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
+          "size": 295
+        }
+      ],
+      "images": [],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-29T17:31:55.535944+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "cf2ef3ca-f80a-4f20-9d5f-934e3021ee5b",
+      "slug": "last-test",
+      "created_at": "2025-08-29 20:31:55.536941",
+      "updated_at": "2025-08-29 20:31:55.536941",
+      "price": 0.0
     }
   ],
-  "last_updated": "2025-08-26 17:49:52.925025"
+  "last_updated": "2025-08-29 20:31:55.536941"
 }

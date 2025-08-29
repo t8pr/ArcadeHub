@@ -54,6 +54,15 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+env_vars = {
+        'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
+        'CLOUDFLARE_ACCESS_KEY_ID': os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
+        'CLOUDFLARE_SECRET_ACCESS_KEY': '***' if os.getenv('CLOUDFLARE_SECRET_ACCESS_KEY') else None,
+        'CLOUDFLARE_BUCKET_NAME': os.getenv('CLOUDFLARE_BUCKET_NAME')
+    }
+
+account_id = env_vars['CLOUDFLARE_ACCOUNT_ID']
+bucket_name = env_vars['CLOUDFLARE_BUCKET_NAME']
 
 @app.route('/test-cloudflare-simple')
 @login_required
@@ -62,13 +71,6 @@ def test_cloudflare_simple():
     if not current_user.is_developer():
         flash('يجب أن تكون مطوراً لاختبار هذه الميزة', 'error')
         return redirect(url_for('account'))
-    
-    env_vars = {
-        'CLOUDFLARE_ACCOUNT_ID': os.getenv('CLOUDFLARE_ACCOUNT_ID'),
-        'CLOUDFLARE_ACCESS_KEY_ID': os.getenv('CLOUDFLARE_ACCESS_KEY_ID'),
-        'CLOUDFLARE_SECRET_ACCESS_KEY': '***' if os.getenv('CLOUDFLARE_SECRET_ACCESS_KEY') else None,
-        'CLOUDFLARE_BUCKET_NAME': os.getenv('CLOUDFLARE_BUCKET_NAME')
-    }
     
     # Just test if we can create a client
     try:
@@ -88,7 +90,7 @@ def test_cloudflare_simple():
                              success=False,
                              message=f"❌ خطأ في إنشاء العميل: {str(e)}",
                              env_vars=env_vars)
-
+    
 # After supabase_client initialization, add:
 try:
     supabase_url = os.getenv('SUPABASE_URL')
@@ -1138,23 +1140,12 @@ def download_game(game_id):
             flash('لا توجد ملفات متاحة للتحميل', 'error')
             return redirect(url_for('game_details', game_slug=game['slug']))
 
+        # الملف الرئيسي للتحميل
         main_file = game['game_files'][0]
-        file_key = main_file['key']
-        original_filename = main_file['filename']
+        file_url = main_file['url']  # الرابط العام للملف
 
-        # توليد Presigned URL مع تحديد اسم الملف عند التنزيل
-        download_url = r2_client.generate_presigned_url(
-            'get_object',
-            Params={
-                'Bucket': 'games',       # اسم البكت
-                'Key': file_key,
-                'ResponseContentDisposition': f'attachment; filename="{original_filename}"'
-            },
-            ExpiresIn=3600  # صلاحية الرابط ساعة
-        )
-
-        # إعادة التوجيه مباشرة للرابط
-        return redirect(download_url)
+        # إعادة التوجيه مباشرة للرابط الثابت
+        return redirect(main_file['url'])
 
     except Exception as e:
         flash(f'حدث خطأ أثناء التحميل: {str(e)}', 'error')
@@ -1211,12 +1202,15 @@ def upload_game():
             flash('فشل في رفع الصورة المصغرة', 'error')
             return redirect(url_for('upload'))
         
+        '''thumbnail_url = f"https://{bucket_name}.{account_id}.r2.cloudflarestorage.com/{thumbnail_key}"''' #deploy code
+        thumbnail_url = f"https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/{thumbnail_key}"
+        
         # Upload game files and calculate total size
         game_file_urls = []
         total_size_bytes = 0
         
         for game_file in game_files:
-            if game_file.filename:  # Check if file was selected
+            if game_file.filename:
                 game_file_data = game_file.read()
                 total_size_bytes += len(game_file_data)
                 
@@ -1230,7 +1224,8 @@ def upload_game():
                 )
                 
                 if game_file_uploaded:
-                    game_file_url = r2_client.generate_presigned_url(game_file_key)
+                    '''game_file_url = f"https://{bucket_name}.{account_id}.r2.cloudflarestorage.com/{game_file_key}"''' #deploy code
+                    game_file_url = f"https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/{game_file_key}"
                     game_file_urls.append({
                         'url': game_file_url,
                         'filename': unique_filename,
@@ -1240,9 +1235,10 @@ def upload_game():
         # Upload additional images
         image_urls = []
         for image in additional_images:
-            if image.filename:  # Check if file was selected
+            if image.filename:
                 image_data = image.read()
-                image_key = f"content/{safe_dev_name}/{safe_title}/images/{image.filename}"
+                image_key = f"content/{safe_dev_name}/{safe_title}/images/{uuid.uuid4()}_{image.filename}"
+                
                 image_uploaded = r2_client.upload_file(
                     image_data,
                     image_key,
@@ -1250,7 +1246,8 @@ def upload_game():
                 )
                 
                 if image_uploaded:
-                    image_url = r2_client.generate_presigned_url(image_key)
+                    '''image_url = f"https://{bucket_name}.{account_id}.r2.cloudflarestorage.com/{image_key}"''' #deploy code
+                    image_url = f"https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/{image_key}"
                     image_urls.append(image_url)
         
         # Calculate size in MB
@@ -1267,7 +1264,7 @@ def upload_game():
             'platform': platform,
             'video_url': video_url,
             'features': [f for f in features if f],
-            'thumbnail_url': r2_client.generate_presigned_url(thumbnail_key),
+            'thumbnail_url': thumbnail_url,
             'game_files': game_file_urls,
             'images': image_urls,
             'size': f"{total_size_mb:.2f} MB",
