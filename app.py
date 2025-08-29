@@ -22,6 +22,7 @@ import io
 from games_db import games_db
 from werkzeug.utils import secure_filename
 import arabic_reshaper
+from bidi.algorithm import get_display
 # Load environment variables
 load_dotenv()
 
