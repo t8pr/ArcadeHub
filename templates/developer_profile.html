@@ -3,7 +3,8 @@
 {% block title %}ملف المطور - {{ developer.username }}{% endblock %}
 
 {% block content %}
-<div class="developer-profile-container">
+<div class="">
+    <div class="developer-profile-container">
     <!-- Developer Header -->
     <div class="developer-header">
         <div class="developer-hero">
@@ -208,27 +209,28 @@
     </div>
     </div>
 
-<!-- Share Modal -->
-<div id="shareModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeShareModal()">&times;</span>
-        <h3><i class="fas fa-share-alt"></i> مشاركة ملف المطور</h3>
-        <p>انسخ الرابط أدناه لمشاركته:</p>
-        <div class="share-link">
-        <input type="text" id="shareUrl" readonly value="{{ url_for('developer_profile', username=developer.username, _external=True) }}">            <button onclick="copyShareLink()">
-                <i class="fas fa-copy"></i>
-            </button>
-        </div>
-        <div class="social-share">
-            <button class="social-btn twitter" onclick="shareOnTwitter()">
-                <i class="fab fa-twitter"></i>
-            </button>
-            <button class="social-btn linkedin" onclick="shareOnLinkedIn()">
-                <i class="fab fa-linkedin"></i>
-            </button>
-            <button class="social-btn whatsapp" onclick="shareOnWhatsApp()">
-                <i class="fab fa-whatsapp"></i>
-            </button>
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeShareModal()">&times;</span>
+            <h3><i class="fas fa-share-alt"></i> مشاركة ملف المطور</h3>
+            <p>انسخ الرابط أدناه لمشاركته:</p>
+            <div class="share-link">
+            <input type="text" id="shareUrl" readonly value="{{ url_for('developer_profile', username=developer.username, _external=True) }}">            <button onclick="copyShareLink()">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <div class="social-share">
+                <button class="social-btn twitter" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i>
+                </button>
+                <button class="social-btn linkedin" onclick="shareOnLinkedIn()">
+                    <i class="fab fa-linkedin"></i>
+                </button>
+                <button class="social-btn whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -1118,6 +1120,11 @@ window.onclick = function(event) {
     
     .developer-header {
         padding: 1.5rem;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     
     .avatar-image {

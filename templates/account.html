@@ -32,7 +32,10 @@
                     <i class="fas fa-user"></i>
                     <span>معلومات الحساب</span>
                 </a>
-                
+                <a href="#wishlist" class="menu-item" onclick="showSection('wishlist')">
+                    <i class="fas fa-heart"></i>
+                    <span>قائمة المفضلة</span>
+                </a>
                 {% if user.is_developer() %}
                 <a class="menu-item" target="_blank" href="{{ url_for('developer_profile', username=current_user.username) }}">
                     <i class="fas fa-file-alt"></i>
@@ -147,7 +150,56 @@
                 </div>
             </div>
         </div>
+        <!-- Wishlist Section -->
+        <div id="wishlist" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-heart"></i> قائمة المفضلة</h2>
+            </div>
 
+            <div class="wishlist-content">
+                {% if wishlist_games and wishlist_games|length > 0 %}
+                    <div class="wishlist-slider-container">
+                        <div class="wishlist-slider" id="wishlistSlider">
+                            {% for game in wishlist_games %}
+                            <div class="wishlist-game-card" data-game-id="{{ game.id }}">
+                                <div class="game-thumbnail">
+                                    <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}" 
+                                        onerror="this.src='{{ url_for('static', filename='images/default-game.png') }}'">
+                                    <button class="remove-from-wishlist" onclick="removeFromWishlist('{{ game.id }}', this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="game-info">
+                                    <h3>{{ game.title }}</h3>
+                                    <p class="game-description">{{ game.short_description }}</p>
+                                    <div class="game-meta">
+                                        <span class="rating">
+                                            <i class="fas fa-star"></i> {{ game.rating }}
+                                        </span>
+                                        <span class="downloads">
+                                            <i class="fas fa-download"></i> {{ game.downloads }}
+                                        </span>
+                                    </div>
+                                    <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="view-game-btn">
+                                        عرض اللعبة
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-wishlist">
+                        <i class="fas fa-heart"></i>
+                        <h3>قائمة المفضلة فارغة</h3>
+                        <p>يمكنك إضافة الألعاب إلى المفضلة من خلال صفحة اللعبة</p>
+                        <a href="{{ url_for('games') }}" class="btn btn-primary">
+                            استكشف الألعاب
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
             <!-- Security Section -->
             <div id="security" class="content-section">
                 <div class="section-header">
@@ -200,7 +252,7 @@
                         </a>
                     </div>
                 </div>
-</div>
+            </div>
 
             <!-- Settings Section -->
             <div id="settings" class="content-section">
@@ -393,45 +445,151 @@
 
 <script>
 
-// Handle flash messages when page has hash URL
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if we have flash messages
-    const flashMessages = document.querySelectorAll('.flash-message');
-    
-    if (flashMessages.length > 0) {
-        // Remove any hash from URL to prevent scrolling
-        if (window.location.hash) {
-            // Store the hash for later use
-            const hash = window.location.hash;
-            window.location.hash = '';
-            
-            // Scroll to the section after a short delay to allow flash messages to be seen
-            setTimeout(() => {
-                window.location.hash = hash;
-            }, 100);
+// Wishlist functionality
+function removeFromWishlist(gameId, button) {
+    fetch('/remove-from-wishlist/' + gameId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
         }
-        
-        // Auto-remove flash messages after 5 seconds
-        flashMessages.forEach(message => {
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the card from the UI
+            const card = button.closest('.wishlist-game-card');
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.8)';
             setTimeout(() => {
-                if (message.parentNode) {
-                    message.remove();
+                card.remove();
+                
+                // Check if wishlist is now empty
+                const remainingCards = document.querySelectorAll('.wishlist-game-card');
+                if (remainingCards.length === 0) {
+                    // Reload the section to show empty state
+                    location.reload();
+                } else {
+                    // Reset slider position
+                    currentSlide = 0;
+                    document.getElementById('wishlistSlider').style.transform = 'translateX(0)';
+                    updateSliderButtons();
                 }
-            }, 5000);
-        });
+            }, 300);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('حدث خطأ في إزالة اللعبة من المفضلة');
+    });
+}
+
+// Slider functionality
+let currentSlide = 0;
+
+function slideWishlist(direction) {
+    const slider = document.getElementById('wishlistSlider');
+    const cards = document.querySelectorAll('.wishlist-game-card');
+    
+    if (cards.length === 0) return;
+    
+    // Calculate how many cards to show based on screen size
+    let cardsToShow = 3;
+    if (window.innerWidth <= 1024) cardsToShow = 2;
+    if (window.innerWidth <= 768) cardsToShow = 1;
+    
+    const cardWidth = cards[0].offsetWidth + 20; // card width + margin
+    const maxSlides = Math.max(0, cards.length - cardsToShow);
+    
+    currentSlide += direction;
+    
+    // Boundary checks
+    if (currentSlide < 0) currentSlide = 0;
+    if (currentSlide > maxSlides) currentSlide = maxSlides;
+    
+    slider.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
+    
+    // Update button states
+    updateSliderButtons();
+}
+
+function updateSliderButtons() {
+    const cards = document.querySelectorAll('.wishlist-game-card');
+    const prevBtn = document.querySelector('.slider-btn.prev');
+    const nextBtn = document.querySelector('.slider-btn.next');
+    
+    // If no buttons exist (when cards <= 3), exit
+    if (!prevBtn || !nextBtn) return;
+    
+    // Calculate how many cards to show based on screen size
+    let cardsToShow = 3;
+    if (window.innerWidth <= 1024) cardsToShow = 2;
+    if (window.innerWidth <= 768) cardsToShow = 1;
+    
+    if (cards.length <= cardsToShow) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        return;
     }
     
-    // If we came from a form submission with a hash, scroll to that section
-    if (window.location.hash) {
-        setTimeout(() => {
-            const element = document.querySelector(window.location.hash);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        }, 100);
+    prevBtn.style.display = 'flex';
+    nextBtn.style.display = 'flex';
+    
+    if (currentSlide === 0) {
+        prevBtn.disabled = true;
+        prevBtn.style.opacity = '0.5';
+    } else {
+        prevBtn.disabled = false;
+        prevBtn.style.opacity = '1';
     }
+    
+    if (currentSlide >= Math.max(0, cards.length - cardsToShow)) {
+        nextBtn.disabled = true;
+        nextBtn.style.opacity = '0.5';
+    } else {
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = '1';
+    }
+}
+
+// Initialize slider on page load and when wishlist section is shown
+function initWishlistSlider() {
+    const wishlistSection = document.getElementById('wishlist');
+    if (wishlistSection && wishlistSection.classList.contains('active')) {
+        currentSlide = 0;
+        const slider = document.getElementById('wishlistSlider');
+        if (slider) {
+            slider.style.transform = 'translateX(0)';
+        }
+        updateSliderButtons();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initWishlistSlider();
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        currentSlide = 0;
+        const slider = document.getElementById('wishlistSlider');
+        if (slider) {
+            slider.style.transform = 'translateX(0)';
+        }
+        updateSliderButtons();
+    });
 });
+
+// Update the showSection function to initialize slider when wishlist is shown
+const originalShowSection = showSection;
+showSection = function(sectionId) {
+    originalShowSection(sectionId);
     
+    // Initialize slider if wishlist section is shown
+    if (sectionId === 'wishlist') {
+        setTimeout(initWishlistSlider, 100);
+    }
+};  
 // Skills management
 
 function validateSkillLevel(input) {
@@ -1422,5 +1580,264 @@ input:checked + .slider:before {
     }
 }
 
+/* Wishlist Styles */
+.wishlist-content {
+    padding: 1rem 0;
+}
+
+.wishlist-slider-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px;
+}
+
+.wishlist-slider {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.3s ease;
+    padding: 10px 0;
+    min-height: 320px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.wishlist-game-card {
+    flex: 0 0 calc(33.333% - 14px);
+    background: #3d3d3d;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 300px;
+}
+
+.wishlist-game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.wishlist-game-card .game-thumbnail {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.wishlist-game-card .game-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.wishlist-game-card:hover .game-thumbnail img {
+    transform: scale(1.05);
+}
+
+.remove-from-wishlist {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.wishlist-game-card:hover .remove-from-wishlist {
+    opacity: 1;
+}
+
+.remove-from-wishlist:hover {
+    background: #e74c3c;
+}
+
+.wishlist-game-card .game-info {
+    padding: 1rem;
+}
+
+.wishlist-game-card .game-info h3 {
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wishlist-game-card .game-description {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 40px;
+}
+
+.wishlist-game-card .game-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.wishlist-game-card .rating,
+.wishlist-game-card .downloads {
+    color: #8f8f8f;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.wishlist-game-card .rating {
+    color: #f39c12;
+}
+
+.view-game-btn {
+    display: block;
+    text-align: center;
+    background: rgba(46, 198, 48, 0.1);
+    color: #2EC630;
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.view-game-btn:hover {
+    background: rgba(46, 198, 48, 0.2);
+}
+
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.slider-btn {
+    pointer-events: auto;
+    background: rgba(61, 61, 61, 0.8);
+    color: #f0f0f0;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.slider-btn:hover:not(:disabled) {
+    background: #3d3d3d;
+    transform: scale(1.1);
+}
+
+.slider-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.empty-wishlist {
+    text-align: center;
+    padding: 3rem;
+    color: #8f8f8f;
+}
+
+.empty-wishlist i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #e74c3c;
+    opacity: 0.5;
+}
+
+.empty-wishlist h3 {
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .wishlist-game-card {
+        flex: 0 0 calc(50% - 10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .wishlist-slider-container {
+        padding: 0 30px;
+    }
+    
+    .wishlist-game-card {
+        flex: 0 0 100%;
+    }
+    
+    .slider-btn {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wishlist-slider-container {
+        padding: 0 20px;
+    }
+    
+    .wishlist-game-card {
+        min-width: 250px;
+    }
+    
+    .wishlist-game-card .game-thumbnail {
+        height: 150px;
+    }
+}
+
+.wishlist-slider {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.3s ease;
+    padding: 10px 0;
+    min-height: 320px; /* Prevent layout shift when empty */
+}
+
+/* Ensure proper card sizing */
+.wishlist-game-card {
+    flex: 0 0 calc(33.333% - 14px);
+    background: #3d3d3d;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 300px;
+    max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .wishlist-game-card {
+        flex: 0 0 calc(50% - 10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .wishlist-game-card {
+        flex: 0 0 100%;
+    }
+}
 </style>
 {% endblock %}

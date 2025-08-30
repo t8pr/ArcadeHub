@@ -109,17 +109,22 @@ except Exception as e:
     supabase_client = None
 
 class User(UserMixin):
-    def __init__(self, id, email, username, account_type, created_at=None, social_media=None, skills=None):
+    def __init__(self, id, email, username, account_type, created_at=None, social_media=None, skills=None, wishlist=None):
         self.id = id
         self.email = email
         self.username = username
         self.account_type = account_type
         self.created_at = created_at
         self.social_media = social_media or {}
-        self.skills = skills or []  # Add skills field
+        self.skills = skills or []
+        self.wishlist = wishlist or []  # Add wishlist field
     
     def is_developer(self):
         return self.account_type == 'developer'
+    
+    def has_in_wishlist(self, game_id):
+        """Check if a game is in user's wishlist"""
+        return game_id in self.wishlist
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -127,9 +132,9 @@ def load_user(user_id):
         return None
         
     try:
-        # Get user with skills column
+        # Get user with all fields including wishlist
         response = supabase_client.table('users').select(
-            'id, email, username, account_type, created_at, social_media, skills'
+            'id, email, username, account_type, created_at, social_media, skills, wishlist'
         ).eq('id', user_id).execute()
         
         if response.data:
@@ -141,11 +146,12 @@ def load_user(user_id):
                 account_type=user_data['account_type'],
                 created_at=user_data.get('created_at'),
                 social_media=user_data.get('social_media', {}),
-                skills=user_data.get('skills', [])  # Include skills
+                skills=user_data.get('skills', []),
+                wishlist=user_data.get('wishlist', [])  # Include wishlist
             )
     except Exception as e:
         print(f"Error loading user: {e}")
-        # Fallback without social_media and skills
+        # Fallback without additional fields
         try:
             response = supabase_client.table('users').select(
                 'id, email, username, account_type, created_at'
@@ -161,7 +167,7 @@ def load_user(user_id):
                     created_at=user_data.get('created_at')
                 )
         except Exception as inner_e:
-            print(f"Error loading user without social_media: {inner_e}")
+            print(f"Error loading user without additional fields: {inner_e}")
     
     return None
 
@@ -422,10 +428,22 @@ def account():
     """User account page"""
     try:
         from games_db import games_db
-        developer_games = games_db.get_developer_games(current_user.id)
+        
+        # Get developer games
+        developer_games = games_db.get_developer_games(current_user.id) if current_user.is_developer() else []
+        
+        # Get wishlist games
+        wishlist_games = []
+        if current_user.wishlist:
+            for game_id in current_user.wishlist:
+                game = games_db.get_game_by_id(game_id)
+                if game:
+                    wishlist_games.append(game)
+        
     except ImportError as e:
         print(f"Games DB import error: {e}")
         developer_games = []
+        wishlist_games = []
     
     # Get social media data from current user
     user_social_media = getattr(current_user, 'social_media', {})
@@ -433,7 +451,74 @@ def account():
     return render_template('account.html', 
                          user=current_user, 
                          developer_games=developer_games,
+                         wishlist_games=wishlist_games,  # Add this line
                          user_social_media=user_social_media)
+
+@app.route('/add-to-wishlist/<game_id>', methods=['POST'])
+@login_required
+def add_to_wishlist(game_id):
+    """Add a game to user's wishlist"""
+    try:
+        # Get the current wishlist
+        response = supabase_client.table('users').select('wishlist').eq('id', current_user.id).execute()
+        current_wishlist = response.data[0].get('wishlist', []) if response.data else []
+        
+        # Check if game is already in wishlist
+        if game_id in current_wishlist:
+            return jsonify({'success': False, 'message': 'اللعبة موجودة بالفعل في المفضلة'})
+        
+        # Add game to wishlist
+        updated_wishlist = current_wishlist + [game_id]
+        
+        # Update the database
+        update_response = supabase_client.table('users').update({
+            'wishlist': updated_wishlist,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.wishlist = updated_wishlist
+            return jsonify({'success': True, 'message': 'تمت إضافة اللعبة إلى المفضلة'})
+        else:
+            return jsonify({'success': False, 'message': 'فشل في إضافة اللعبة إلى المفضلة'})
+            
+    except Exception as e:
+        print(f"Wishlist error: {e}")
+        return jsonify({'success': False, 'message': 'حدث خطأ في إضافة اللعبة إلى المفضلة'})
+
+@app.route('/remove-from-wishlist/<game_id>', methods=['POST'])
+@login_required
+def remove_from_wishlist(game_id):
+    """Remove a game from user's wishlist"""
+    try:
+        # Get the current wishlist
+        response = supabase_client.table('users').select('wishlist').eq('id', current_user.id).execute()
+        current_wishlist = response.data[0].get('wishlist', []) if response.data else []
+        
+        # Check if game is in wishlist
+        if game_id not in current_wishlist:
+            return jsonify({'success': False, 'message': 'اللعبة غير موجودة في المفضلة'})
+        
+        # Remove game from wishlist
+        updated_wishlist = [game for game in current_wishlist if game != game_id]
+        
+        # Update the database
+        update_response = supabase_client.table('users').update({
+            'wishlist': updated_wishlist,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', current_user.id).execute()
+        
+        if update_response.data:
+            # Update the current user object
+            current_user.wishlist = updated_wishlist
+            return jsonify({'success': True, 'message': 'تمت إزالة اللعبة من المفضلة'})
+        else:
+            return jsonify({'success': False, 'message': 'فشل في إزالة اللعبة من المفضلة'})
+            
+    except Exception as e:
+        print(f"Wishlist error: {e}")
+        return jsonify({'success': False, 'message': 'حدث خطأ في إزالة اللعبة من المفضلة'})
 
 @app.route('/update-social-media', methods=['POST'])
 @login_required
@@ -478,11 +563,33 @@ def update_social_media():
     
     return redirect(url_for('account') + '#settings')
 
+def update_developer_games_username(developer_id, old_username, new_username):
+    """
+    Update the developer username in all games created by this developer
+    """
+    try:
+        from games_db import games_db
+        
+        # Get all games by this developer
+        developer_games = games_db.get_developer_games(developer_id)
+        
+        # Update each game's developer field
+        for game in developer_games:
+            games_db.update_game(game['id'], {
+                'developer': new_username
+            })
+            
+        print(f"✅ Updated username in {len(developer_games)} games from '{old_username}' to '{new_username}'")
+        
+    except Exception as e:
+        print(f"❌ Error updating developer username in games: {e}")
+
 @app.route('/update-username', methods=['POST'])
 @login_required
 def update_username():
     try:
         new_username = request.form.get('new_username', '').strip()
+        old_username = current_user.username  # Store the old username
         
         if not new_username:
             flash('لم يتم تقديم اسم مستخدم', 'error')
@@ -518,6 +625,11 @@ def update_username():
         if update_response.data:
             # Update the current user object
             current_user.username = new_username
+            
+            # If user is a developer, update their games in the database
+            if current_user.is_developer():
+                update_developer_games_username(current_user.id, old_username, new_username)
+            
             flash('تم تحديث اسم المستخدم بنجاح', 'success')
         else:
             flash('فشل في تحديث اسم المستخدم', 'error')

@@ -57,8 +57,8 @@
                 </button>
                 
                 <div class="secondary-actions">
-                    <button class="btn-icon" onclick="addToWishlist('{{ game.id }}')">
-                        <i class="far fa-heart"></i>
+                    <button class="btn-icon" id="wishlistBtn" onclick="toggleWishlist('{{ game.id }}')">
+                        <i class="{% if current_user.is_authenticated and current_user.has_in_wishlist(game.id) %}fas{% else %}far{% endif %} fa-heart"></i>
                     </button>
                     <button class="btn-icon" onclick="shareGame('{{ game.id }}')">
                         <i class="fas fa-share-alt"></i>
@@ -275,9 +275,54 @@ function shareGame(gameId) {
 }
 
 // Wishlist functionality
-function addToWishlist(gameId) {
-    // Implement wishlist functionality
-    alert('تمت إضافة اللعبة إلى المفضلة');
+function toggleWishlist(gameId) {
+    {% if not current_user.is_authenticated %}
+        alert('يجب تسجيل الدخول لإضافة اللعبة إلى المفضلة');
+        return;
+    {% endif %}
+    
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    const heartIcon = wishlistBtn.querySelector('i');
+    
+    // Optimistic UI update
+    const isCurrentlyFavorite = heartIcon.classList.contains('fas');
+    const url = isCurrentlyFavorite ? '/remove-from-wishlist/' : '/add-to-wishlist/';
+    
+    if (isCurrentlyFavorite) {
+        heartIcon.classList.replace('fas', 'far');
+    } else {
+        heartIcon.classList.replace('far', 'fas');
+    }
+    
+    // Send AJAX request
+    fetch(url + gameId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            // Revert UI if failed
+            if (isCurrentlyFavorite) {
+                heartIcon.classList.replace('far', 'fas');
+            } else {
+                heartIcon.classList.replace('fas', 'far');
+            }
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Revert UI on error
+        if (isCurrentlyFavorite) {
+            heartIcon.classList.replace('far', 'fas');
+        } else {
+            heartIcon.classList.replace('fas', 'far');
+        }
+        alert('حدث خطأ في تحديث المفضلة');
+    });
 }
 
 // Close modal when clicking outside
