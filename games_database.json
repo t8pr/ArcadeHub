@@ -2,7 +2,7 @@
   "games": [
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "alhadman",
+      "developer": "asome",
       "title": "Altima",
       "description": "القيادة السريعة",
       "short_description": "حاول الفرار من الشرطة",
@@ -39,7 +39,7 @@
       "id": "50ca8ce2-b994-422c-b6d7-45f6d2f0790f",
       "slug": "altima",
       "created_at": "2025-08-24 05:22:20.381499",
-      "updated_at": "2025-08-31 00:00:10.261754"
+      "updated_at": "2025-09-01 00:53:13.506750"
     },
     {
       "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
@@ -277,7 +277,7 @@
     },
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "alhadman",
+      "developer": "asome",
       "title": "Altoto",
       "description": "Hard Driver",
       "short_description": "Zgane",
@@ -311,7 +311,7 @@
       "id": "303c9841-6fa6-49b5-b521-9394e0d84a1b",
       "slug": "altoto",
       "created_at": "2025-08-26 17:49:52.925010",
-      "updated_at": "2025-08-31 00:00:10.274590",
+      "updated_at": "2025-09-01 00:53:13.524568",
       "price": 0.0
     },
     {
@@ -445,7 +445,47 @@
       "created_at": "2025-08-29 20:31:55.536941",
       "updated_at": "2025-08-29 20:31:55.536941",
       "price": 0.0
+    },
+    {
+      "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
+      "developer": "asome",
+      "title": "Osama Test",
+      "description": "GreatGame",
+      "short_description": "Fast to download",
+      "category": "strategy",
+      "platform": [
+        "windows",
+        "mac",
+        "linux"
+      ],
+      "video_url": "https://www.youtube.com/embed/tHW-gZkbpM8?si=2_6ueM9UAkUDXD6-",
+      "features": [
+        "خفيفة على الجهاز"
+      ],
+      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/thumbnail.png",
+      "game_files": [
+        {
+          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/files/1e2d1529-3afd-4127-9ecf-36b39083dcc4_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
+          "filename": "1e2d1529-3afd-4127-9ecf-36b39083dcc4_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
+          "size": 295
+        }
+      ],
+      "images": [
+        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/images/20f935d3-2568-4329-966e-48d2f9249461_Zorobin.jpg",
+        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/images/627a763f-96d9-467c-ac1f-6af452106798_images.jfif"
+      ],
+      "size": "0.00 MB",
+      "version": "1.0.0",
+      "release_date": "2025-08-31T22:50:23.364605+00:00",
+      "rating": 0.0,
+      "downloads": 0,
+      "status": "published",
+      "id": "6385ff90-1199-474f-a538-a326c4f8c33a",
+      "slug": "osama-test",
+      "created_at": "2025-09-01 00:50:23.365256",
+      "updated_at": "2025-09-01 00:53:13.537566",
+      "price": 0.0
     }
   ],
-  "last_updated": "2025-08-31 00:00:10.274601"
+  "last_updated": "2025-09-01 00:53:13.537576"
 }
