@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}تم رفع اللعبة بنجاح - SaudiArcade{% endblock %}
+
+{% block content %}
+<main class="container">
+    <section class="upload-success-section">
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>تم رفع اللعبة بنجاح!</h1>
+            <p>لعبتك الآن جاهزة للعرض على المنصة</p>
+        </div>
+        
+        <div class="game-preview-card">
+            <div class="game-thumbnail">
+                {% if game.thumbnail_url %}
+                <img src="{{ game.thumbnail_url }}" alt="{{ game.title }}">
+                {% else %}
+                <div class="thumbnail-placeholder">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="game-details">
+                <h2>{{ game.title }}</h2>
+                <p class="game-description">{{ game.short_description }}</p>
+                
+                <div class="game-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ game.category }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-desktop"></i>
+                        <span>{{ game.platform|join(', ') }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>{{ game.release_date|format_date }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="success-actions">
+            <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> معاينة اللعبة
+            </a>
+            <a href="{{ url_for('upload') }}" class="btn btn-secondary">
+                <i class="fas fa-plus"></i> رفع لعبة جديدة
+            </a>
+            <a href="{{ url_for('developer_profile', username=current_user.username) }}" class="btn btn-secondary">
+                <i class="fas fa-user"></i> العودة إلى الملف الشخصي
+            </a>
+        </div>
+        
+        <div class="next-steps">
+            <h3>الخطوات التالية</h3>
+            <ul>
+                <li><i class="fas fa-share-alt"></i> شارك لعبتك مع الآخرين</li>
+                <li><i class="fas fa-chart-line"></i> تتبع إحصائيات التحميلات</li>
+                <li><i class="fas fa-comments"></i> تفاعل مع تعليقات اللاعبين</li>
+            </ul>
+        </div>
+    </section>
+</main>
+
+<style>
+.upload-success-section {
+    text-align: center;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.success-header {
+    margin-bottom: 2.5rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #2EC630;
+    margin-bottom: 1rem;
+    animation: scaleUp 0.5s ease-in-out;
+}
+
+.success-header h1 {
+    color: #2EC630;
+    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+}
+
+.success-header p {
+    color: #b0b0b0;
+    font-size: 1.1rem;
+}
+
+.game-preview-card {
+    background: #3d3d3d;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    text-align: right;
+}
+
+.game-thumbnail img {
+width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.thumbnail-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #2d2d2d, #3d3d3d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #2EC630;
+    border: 3px solid #2EC630;
+}
+
+.game-details {
+    flex-grow: 1;
+    text-align: right;
+}
+
+.game-details h2 {
+    color: #f0f0f0;
+    margin-bottom: 0.8rem;
+    font-size: 1.8rem;
+}
+
+.game-description {
+    color: #b0b0b0;
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+}
+
+.game-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #8f8f8f;
+    background: #2d2d2d;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.meta-item i {
+    color: #2EC630;
+}
+
+.success-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #2EC630;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #25a328;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #3d3d3d;
+    color: #f0f0f0;
+    border: 2px solid #2EC630;
+}
+
+.btn-secondary:hover {
+    background: #2d2d2d;
+    transform: translateY(-2px);
+}
+
+.next-steps {
+    background: rgba(46, 198, 48, 0.1);
+    border: 1px solid #2EC630;
+    border-radius: 12px;
+    padding: 1.8rem;
+}
+
+.next-steps h3 {
+    color: #2EC630;
+    margin-bottom: 1.2rem;
+    font-size: 1.4rem;
+}
+
+.next-steps ul {
+    list-style: none;
+    text-align: right;
+}
+
+.next-steps li {
+    padding: 0.8rem 0;
+    color: #b0b0b0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-bottom: 1px solid rgba(46, 198, 48, 0.2);
+}
+
+.next-steps li:last-child {
+    border-bottom: none;
+}
+
+.next-steps li i {
+    color: #2EC630;
+}
+
+@keyframes scaleUp {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-preview-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .game-details {
+        text-align: center;
+    }
+    
+    .game-meta {
+        justify-content: center;
+    }
+    
+    .success-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

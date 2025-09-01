@@ -2603,25 +2603,25 @@ body.menu-open {
 .flash-success {
     background: #2EC630;
     color: white;
-    border-left: 5px solid #25a328;
+    border-right: 5px solid #25a328;
 }
 
 .flash-error {
     background: #e74c3c;
     color: white;
-    border-left: 5px solid #c0392b;
+    border-right: 5px solid #c0392b;
 }
 
 .flash-info {
     background: #3498db;
     color: white;
-    border-left: 5px solid #2980b9;
+    border-right: 5px solid #2980b9;
 }
 
 .flash-warning {
     background: #f39c12;
     color: white;
-    border-left: 5px solid #e67e22;
+    border-right: 5px solid #e67e22;
 }
 
 .flash-close {
@@ -2629,8 +2629,9 @@ body.menu-open {
     border: none;
     color: white;
     cursor: pointer;
-    margin-left: 15px;
-    font-size: 16px;
+    margin: 0 10px 0 0;
+    font-size: 20px;
+    display: flex;
 }
 
 @keyframes slideIn {

@@ -165,7 +165,31 @@
     });
     
     // Hide loader after maximum 10 seconds as a fallback
+    // handle the upload form submission:
     setTimeout(hideLoader, 10000);
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadForm = document.getElementById('uploadForm');
+        
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+                    
+                    // Show loading overlay
+                    document.getElementById('pageLoader').classList.add('active');
+                    document.body.classList.add('loading');
+                }
+            });
+        }
+        
+        // Hide loader when page loads (in case of redirect)
+        window.addEventListener('load', function() {
+            document.getElementById('pageLoader').classList.remove('active');
+            document.body.classList.remove('loading');
+        });
+    });
     </script>
 </body>
 </html>

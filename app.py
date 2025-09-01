@@ -1394,14 +1394,34 @@ def upload_game():
         game_id = games_db.add_game(game_data)
         
         # Return JSON response for AJAX
-        return jsonify({
-            'success': True,
-            'message': 'تم رفع اللعبة بنجاح!',
-            'redirect': url_for('game_details', game_slug=game_data['slug'])
-        })
+        flash('تم رفع اللعبة بنجاح!', 'success')
+        return redirect(url_for('upload_success', game_slug=game_data['slug']))
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        flash(f'حدث خطأ أثناء رفع اللعبة: {str(e)}', 'error')
+        return redirect(url_for('upload'))
+
+@app.route('/upload-success/<game_slug>')
+@login_required
+def upload_success(game_slug):
+    """Show upload success page"""
+    if not current_user.is_developer():
+        flash('يجب أن تكون مطوراً للوصول إلى هذه الصفحة', 'error')
+        return redirect(url_for('account'))
+    
+    try:
+        from games_db import games_db
+        game = games_db.get_game_by_slug(game_slug)
+        
+        if not game:
+            flash('اللعبة غير موجودة', 'error')
+            return redirect(url_for('games'))
+            
+        return render_template('upload_success.html', game=game)
+        
+    except Exception as e:
+        flash('حدث خطأ في تحميل معلومات اللعبة', 'error')
+        return redirect(url_for('games'))
 
 @app.route('/games')
 def games():

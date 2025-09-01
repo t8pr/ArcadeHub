@@ -30,12 +30,8 @@
                         <span class="stat-label">تحميل</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-number">{{ developer.average_rating }}</span>
-                        <span class="stat-label">تقييم</span>
-                    </div>
-                    <div class="stat">
-                    <span class="stat-number">{{ developer.join_date[:4] if developer.join_date and developer.join_date|length >= 4 else '2025' }}</span>
-                    <span class="stat-label">سنة الانضمام</span>
+                        <span class="stat-number">{{ developer.join_date[:4] if developer.join_date and developer.join_date|length >= 4 else '2025' }}</span>
+                        <span class="stat-label">سنة الانضمام</span>
                     </div>
                 </div>
             </div>
