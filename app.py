@@ -1467,5 +1467,181 @@ def game_details(game_slug):
         game['safe_video_url'] = game['video_url']
     
     return render_template('game_details.html', game=game)
+
+
+@app.route('/api/game/<game_id>/comments')
+def get_game_comments(game_id):
+    """Get all comments for a game"""
+    try:
+        # Get all top-level comments (not replies)
+        response = supabase_client.table('game_comments').select(
+            '*, user:users(id, username)'
+
+        ).eq('game_id', game_id).is_('parent_comment_id', 'null').order('created_at').execute()
+        
+        comments = response.data if response.data else []
+        
+        # For each comment, get its replies
+        for comment in comments:
+            replies_response = supabase_client.table('game_comments').select(
+                '*, user:users(id, username)'
+
+            ).eq('parent_comment_id', comment['id']).order('created_at').execute()
+            
+            comment['replies'] = replies_response.data if replies_response.data else []
+        
+        return jsonify({'success': True, 'comments': comments})
+    except Exception as e:
+        print(f"Error fetching comments: {e}")
+        return jsonify({'success': False, 'message': 'Failed to load comments'})
+
+@app.route('/api/game/<game_id>/comment', methods=['POST'])
+@login_required
+def add_comment(game_id):
+    """Add a new comment to a game"""
+    try:
+        content = request.json.get('content', '').strip()
+        parent_comment_id = request.json.get('parent_comment_id')
+        
+        if not content:
+            return jsonify({'success': False, 'message': 'Comment cannot be empty'})
+        
+        if len(content) > 1000:
+            return jsonify({'success': False, 'message': 'Comment is too long'})
+        
+        # Check if the game exists
+        from games_db import games_db
+        game = games_db.get_game_by_id(game_id)
+        if not game:
+            return jsonify({'success': False, 'message': 'Game not found'})
+        
+        # If this is a reply, verify the parent comment exists
+        if parent_comment_id:
+            parent_response = supabase_client.table('game_comments').select('id').eq('id', parent_comment_id).execute()
+            if not parent_response.data:
+                return jsonify({'success': False, 'message': 'Parent comment not found'})
+        
+        # Insert the comment
+        comment_data = {
+            'game_id': game_id,
+            'user_id': current_user.id,  # your server sets this
+            'parent_comment_id': parent_comment_id,
+            'content': content
+        }
+        
+        response = supabase_client.table('game_comments').insert(comment_data).execute()
+        
+        if response.data:
+            # Get the full comment data with user info to return
+            new_comment_response = supabase_client.table('game_comments').select(
+                '*, user:users(id, username)'
+            ).eq('id', response.data[0]['id']).execute()
+            
+            return jsonify({
+                'success': True, 
+                'message': 'Comment added successfully',
+                'comment': new_comment_response.data[0] if new_comment_response.data else None
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Failed to add comment'})
+            
+    except Exception as e:
+        print(f"Error adding comment: {e}")
+        return jsonify({'success': False, 'message': 'Failed to add comment'})
+    
+@app.route('/api/comment/<comment_id>/hide', methods=['POST'])
+@login_required
+def hide_comment(comment_id):
+    try:
+        comment_response = supabase_client.table('game_comments').select('*').eq('id', comment_id).execute()
+        if not comment_response.data:
+            return jsonify({'success': False, 'message': 'Comment not found'})
+
+        comment = comment_response.data[0]
+
+        # Check if current user is the game developer
+        from games_db import games_db
+        game = games_db.get_game_by_id(comment['game_id'])
+        if not game or str(game['developer_id']) != str(current_user.id):
+            return jsonify({'success': False, 'message': 'Only the developer can hide comments'})
+
+        reason = request.json.get('reason', 'Hidden by developer')
+        update_response = supabase_client.table('game_comments').update({
+            'is_hidden': True,
+            'hidden_reason': reason,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', comment_id).execute()
+
+        if update_response.data:
+            return jsonify({'success': True, 'message': 'Comment hidden successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to hide comment'})
+
+    except Exception as e:
+        print(f"Error hiding comment: {e}")
+        return jsonify({'success': False, 'message': 'Failed to hide comment'})
+
+
+@app.route('/api/comment/<comment_id>/unhide', methods=['POST'])
+@login_required
+def unhide_comment(comment_id):
+    try:
+        comment_response = supabase_client.table('game_comments').select('*').eq('id', comment_id).execute()
+        if not comment_response.data:
+            return jsonify({'success': False, 'message': 'Comment not found'})
+
+        comment = comment_response.data[0]
+
+        # Check if current user is the game developer
+        from games_db import games_db
+        game = games_db.get_game_by_id(comment['game_id'])
+        if not game or str(game['developer_id']) != str(current_user.id):
+            return jsonify({'success': False, 'message': 'Only the developer can unhide comments'})
+
+        update_response = supabase_client.table('game_comments').update({
+            'is_hidden': False,
+            'hidden_reason': None,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', comment_id).execute()
+
+        if update_response.data:
+            return jsonify({'success': True, 'message': 'Comment unhidden successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to unhide comment'})
+
+    except Exception as e:
+        print(f"Error unhiding comment: {e}")
+        return jsonify({'success': False, 'message': 'Failed to unhide comment'})
+
+
+@app.route('/api/comment/<comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    """Delete a comment (only by its author)"""
+    try:
+        # Get the comment
+        comment_response = supabase_client.table('game_comments').select('*').eq('id', comment_id).execute()
+        if not comment_response.data:
+            return jsonify({'success': False, 'message': 'Comment not found'})
+
+        comment = comment_response.data[0]
+
+        # Check if current user is the author
+        if str(comment['user_id']) != str(current_user.id):
+            return jsonify({'success': False, 'message': 'You can only delete your own comment'})
+
+        # Delete the comment
+        delete_response = supabase_client.table('game_comments').delete().eq('id', comment_id).execute()
+
+        if delete_response.data:
+            return jsonify({'success': True, 'message': 'Comment deleted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to delete comment'})
+
+    except Exception as e:
+        print(f"Error deleting comment: {e}")
+        return jsonify({'success': False, 'message': 'Failed to delete comment'})
+
+
 if __name__ == '__main__':
     app.run(debug=True)

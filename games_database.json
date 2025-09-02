@@ -2,7 +2,7 @@
   "games": [
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "asome",
+      "developer": "osos",
       "title": "Altima",
       "description": "القيادة السريعة",
       "short_description": "حاول الفرار من الشرطة",
@@ -39,7 +39,7 @@
       "id": "50ca8ce2-b994-422c-b6d7-45f6d2f0790f",
       "slug": "altima",
       "created_at": "2025-08-24 05:22:20.381499",
-      "updated_at": "2025-09-01 00:53:13.506750"
+      "updated_at": "2025-09-02 08:33:24.182388"
     },
     {
       "developer_id": "3d09e95a-2944-4913-916a-3bd6227c48dc",
@@ -277,7 +277,7 @@
     },
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "asome",
+      "developer": "osos",
       "title": "Altoto",
       "description": "Hard Driver",
       "short_description": "Zgane",
@@ -311,7 +311,7 @@
       "id": "303c9841-6fa6-49b5-b521-9394e0d84a1b",
       "slug": "altoto",
       "created_at": "2025-08-26 17:49:52.925010",
-      "updated_at": "2025-09-01 00:53:13.524568",
+      "updated_at": "2025-09-02 08:33:24.194527",
       "price": 0.0
     },
     {
@@ -448,7 +448,7 @@
     },
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "asome",
+      "developer": "osos",
       "title": "Osama Test",
       "description": "GreatGame",
       "short_description": "Fast to download",
@@ -483,12 +483,12 @@
       "id": "6385ff90-1199-474f-a538-a326c4f8c33a",
       "slug": "osama-test",
       "created_at": "2025-09-01 00:50:23.365256",
-      "updated_at": "2025-09-01 00:53:13.537566",
+      "updated_at": "2025-09-02 08:33:24.206547",
       "price": 0.0
     },
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "asome",
+      "developer": "osos",
       "title": "LastTest",
       "description": "لعبة جميلة جدا انصح بتجربة",
       "short_description": "لعبة جميلة جدا لكل الاعمار",
@@ -520,9 +520,9 @@
       "id": "983795e1-9be0-4e86-ba1f-65def93e72ab",
       "slug": "lasttest",
       "created_at": "2025-09-01 07:52:06.968733",
-      "updated_at": "2025-09-01 07:52:06.968745",
+      "updated_at": "2025-09-02 08:33:24.218264",
       "price": 0.0
     }
   ],
-  "last_updated": "2025-09-01 07:52:06.968756"
+  "last_updated": "2025-09-02 08:33:24.218274"
 }

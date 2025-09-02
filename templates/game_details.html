@@ -190,6 +190,29 @@
                 </div>
             </div>
         </section>
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <h2><i class="fas fa-comments"></i> التعليقات</h2>
+
+            <!-- Comment Form -->
+            {% if current_user.is_authenticated %}
+            <div class="comment-form">
+                <textarea id="commentText" placeholder="اكتب تعليقك هنا..." rows="3"></textarea>
+                <button onclick="addComment()" class="btn-comment">
+                    <i class="fas fa-paper-plane"></i> إرسال التعليق
+                </button>
+            </div>
+            {% else %}
+            <div class="login-prompt">
+                <p>يجب <a href="{{ url_for('login') }}">تسجيل الدخول</a> لإضافة تعليق</p>
+            </div>
+            {% endif %}
+
+            <!-- Comments List -->
+            <div class="comments-list" id="commentsList">
+                <div class="loading-comments">جاري تحميل التعليقات...</div>
+            </div>
+        </section>
     </div>
 
     <!-- Lightbox for screenshots -->
@@ -220,6 +243,149 @@
 </div>
 
 <script>
+const CURRENT_USER_ID = "{{ current_user.id if current_user.is_authenticated else '' }}";
+const GAME_DEVELOPER_ID = "{{ game.developer_id }}";
+const GAME_ID = "{{ game.id }}";
+// Comments functionality
+// Load comments from server
+function loadComments() {
+    fetch(`/api/game/${GAME_ID}/comments`)
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('commentsList');
+            if (data.success && data.comments.length > 0) {
+                list.innerHTML = renderComments(data.comments);
+            } else {
+                list.innerHTML = '<div class="no-comments">لا توجد تعليقات بعد</div>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('commentsList').innerHTML = '<div class="error-loading">حدث خطأ في تحميل التعليقات</div>';
+        });
+}
+
+// Render comments and replies
+function renderComments(comments) {
+    return comments.map(comment => {
+        // Actions buttons
+        let actions = '';
+        if (CURRENT_USER_ID) {
+            actions += `<button onclick="showReplyForm('${comment.id}')" class="btn-reply"><i class="fas fa-reply"></i> رد</button>`;
+        }
+        if (CURRENT_USER_ID === GAME_DEVELOPER_ID) {
+            actions += comment.is_hidden
+                ? `<button onclick="unhideComment('${comment.id}')" class="btn-unhide"><i class="fas fa-eye"></i> إظهار</button>`
+                : `<button onclick="hideComment('${comment.id}')" class="btn-hide"><i class="fas fa-eye-slash"></i> إخفاء</button>`;
+        }
+        if (CURRENT_USER_ID === comment.user.id) {
+            actions += `<button onclick="deleteComment('${comment.id}')" class="btn-delete"><i class="fas fa-trash"></i> حذف</button>`;
+        }
+
+        // Replies
+        let repliesHTML = '';
+        if (comment.replies && comment.replies.length > 0) {
+            repliesHTML = `<div class="replies">` + comment.replies.map(reply => {
+                let replyActions = '';
+                if (CURRENT_USER_ID === GAME_DEVELOPER_ID) {
+                    replyActions += reply.is_hidden
+                        ? `<button onclick="unhideComment('${reply.id}')" class="btn-unhide"><i class="fas fa-eye"></i> إظهار</button>`
+                        : `<button onclick="hideComment('${reply.id}')" class="btn-hide"><i class="fas fa-eye-slash"></i> إخفاء</button>`;
+                }
+                if (CURRENT_USER_ID === reply.user.id) {
+                    replyActions += `<button onclick="deleteComment('${reply.id}')" class="btn-delete"><i class="fas fa-trash"></i> حذف</button>`;
+                }
+
+                return `
+                <div class="comment reply ${reply.is_hidden ? 'hidden-comment' : ''}" data-comment-id="${reply.id}">
+                    <div class="comment-header">
+                        <div class="comment-user">${reply.user.username}</div>
+                        <div class="comment-date">${new Date(reply.created_at).toLocaleString('ar-SA')}</div>
+                    </div>
+                    ${reply.is_hidden ? `<div class="hidden-notice">تم إخفاء هذا الرد: ${reply.hidden_reason || ''}</div>` 
+                                      : `<div class="comment-content">${reply.content}</div>`}
+                    <div class="comment-actions">${replyActions}</div>
+                </div>`;
+            }).join('') + `</div>`;
+        }
+
+        return `
+        <div class="comment ${comment.is_hidden ? 'hidden-comment' : ''}" data-comment-id="${comment.id}">
+            <div class="comment-header">
+                <div class="comment-user">${comment.user.username}</div>
+                <div class="comment-date">${new Date(comment.created_at).toLocaleString('ar-SA')}</div>
+            </div>
+            ${comment.is_hidden ? `<div class="hidden-notice">تم إخفاء هذا التعليق: ${comment.hidden_reason || ''}</div>` 
+                                 : `<div class="comment-content">${comment.content}</div>`}
+            <div class="comment-actions">${actions}</div>
+            <div class="reply-form" id="replyForm-${comment.id}" style="display:none;">
+                <textarea id="replyText-${comment.id}" placeholder="اكتب ردك هنا..." rows="2"></textarea>
+                <button onclick="addReply('${comment.id}')" class="btn-reply-submit"><i class="fas fa-paper-plane"></i> إرسال الرد</button>
+                <button onclick="hideReplyForm('${comment.id}')" class="btn-cancel">إلغاء</button>
+            </div>
+            ${repliesHTML}
+        </div>`;
+    }).join('');
+}
+
+// Add comment
+function addComment() {
+    const content = document.getElementById('commentText').value.trim();
+    if (!content) { alert('يرجى كتابة تعليق قبل الإرسال'); return; }
+
+    fetch(`/api/game/${GAME_ID}/comment`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({content})
+    })
+    .then(res=>res.json()).then(data=> {
+        if(data.success){ document.getElementById('commentText').value=''; loadComments(); }
+        else alert(data.message || 'فشل في إضافة التعليق');
+    }).catch(err=>{ console.error(err); alert('حدث خطأ في إضافة التعليق'); });
+}
+
+// Reply
+function showReplyForm(id){ document.getElementById(`replyForm-${id}`).style.display='block'; }
+function hideReplyForm(id){ 
+    document.getElementById(`replyForm-${id}`).style.display='none';
+    document.getElementById(`replyText-${id}`).value='';
+}
+function addReply(parentId){
+    const content = document.getElementById(`replyText-${parentId}`).value.trim();
+    if(!content){ alert('يرجى كتابة رد قبل الإرسال'); return; }
+
+    fetch(`/api/game/${GAME_ID}/comment`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, 
+        body: JSON.stringify({content, parent_comment_id: parentId})
+    }).then(res=>res.json()).then(data=>{
+        if(data.success){ hideReplyForm(parentId); loadComments(); }
+        else alert(data.message || 'فشل في إضافة الرد');
+    }).catch(err=>{ console.error(err); alert('حدث خطأ في إضافة الرد'); });
+}
+
+// Hide / Unhide / Delete
+function hideComment(id){
+    const reason = prompt('أدخل سبب الإخفاء (اختياري):');
+    fetch(`/api/comment/${id}/hide`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({reason})})
+    .then(res=>res.json()).then(data=>{ if(data.success) loadComments(); else alert(data.message); })
+    .catch(err=>{ console.error(err); alert('حدث خطأ في الإخفاء'); });
+}
+
+function unhideComment(id){
+    fetch(`/api/comment/${id}/unhide`, {method:'POST', headers:{'Content-Type':'application/json'}})
+    .then(res=>res.json()).then(data=>{ if(data.success) loadComments(); else alert(data.message); })
+    .catch(err=>{ console.error(err); alert('حدث خطأ في الإظهار'); });
+}
+
+function deleteComment(id){
+    if(!confirm('هل أنت متأكد من حذف هذا التعليق؟')) return;
+    fetch(`/api/comment/${id}/delete`, {method:'POST', headers:{'Content-Type':'application/json'}})
+    .then(res=>res.json()).then(data=>{ if(data.success) loadComments(); else alert(data.message); })
+    .catch(err=>{ console.error(err); alert('حدث خطأ في الحذف'); });
+}
+
+// Load comments on page load
+document.addEventListener('DOMContentLoaded', ()=>loadComments());
+
+
 // Lightbox functionality
 function openLightbox(imageUrl) {
     document.getElementById('lightbox-img').src = imageUrl;
@@ -881,5 +1047,222 @@ document.addEventListener('keydown', function(e) {
         justify-content: center;
     }
 }
+
+/* Comments Section Styles */
+.comments-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #2d2d2d;
+    border-radius: 12px;
+}
+
+.comment-form {
+    margin-bottom: 2rem;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+.btn-comment {
+    background: #2EC630;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.login-prompt a {
+    color: #2EC630;
+    text-decoration: none;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+.comments-list {
+    margin-top: 1rem;
+}
+
+.comment {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: #3d3d3d;
+    border-radius: 8px;
+    border-left: 4px solid #2EC630;
+}
+
+.comment.reply {
+    margin-left: 2rem;
+    background: #353535;
+    border-left-color: #3498db;
+}
+
+.hidden-comment {
+    opacity: 0.7;
+    background: #2a2a2a;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #444;
+}
+
+.comment-user {
+    font-weight: bold;
+    color: #2EC630;
+}
+
+.comment-date {
+    color: #8f8f8f;
+    font-size: 0.9rem;
+}
+
+.comment-content {
+    color: #f0f0f0;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.hidden-notice {
+    padding: 1rem;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 6px;
+    color: #e74c3c;
+    text-align: center;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-reply, .btn-hide {
+    background: transparent;
+    border: 1px solid #555;
+    color: #b0b0b0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-reply:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.btn-hide:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.reply-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.reply-form textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+    resize: vertical;
+    margin-bottom: 0.5rem;
+}
+
+.btn-reply-submit {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.replies {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #444;
+}
+
+.loading-comments, .no-comments, .error-loading {
+    text-align: center;
+    padding: 2rem;
+    color: #8f8f8f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .comments-section {
+        padding: 1.5rem;
+    }
+    
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .comment.reply {
+        margin-left: 1rem;
+    }
+}
+
+.btn-reply, .btn-hide, .btn-unhide, .btn-delete {
+    background: transparent;
+    border: 1px solid #555;
+    color: #b0b0b0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-right: 0.3rem;
+}
+
+.btn-reply:hover { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+.btn-hide:hover, .btn-unhide:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+.btn-delete:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+
+
 </style>
 {% endblock %}
