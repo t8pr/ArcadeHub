@@ -276,45 +276,6 @@
       "price": 0.0
     },
     {
-      "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "osos",
-      "title": "Altoto",
-      "description": "Hard Driver",
-      "short_description": "Zgane",
-      "category": "adventure",
-      "platform": [
-        "windows",
-        "mac",
-        "web"
-      ],
-      "video_url": "",
-      "features": [
-        "القوه",
-        "الغضب",
-        "السرعة"
-      ],
-      "thumbnail_url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/OsamaAlhamdan/Altoto/thumbnail.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250826%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250826T154952Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=1c319335fc4c6e157419f6fcbc11b532ea89b9a7912201eebfa1c8a823f77ecb",
-      "game_files": [
-        {
-          "url": "https://f375095c0821d8d77478b3a3b8d82609.r2.cloudflarestorage.com/games/content/OsamaAlhamdan/Altoto/files/4c240f75-1d15-4aa2-98b9-d730cfe12720_GoogleCloudSDKInstaller.exe?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=0a7a6c55cc1d4ac26a45566909007fcf%2F20250826%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250826T154952Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=4da62476e5f8a91b29a548ca4da11e2329ab3664ae6b83b1f2caee39785c151b",
-          "filename": "4c240f75-1d15-4aa2-98b9-d730cfe12720_GoogleCloudSDKInstaller.exe",
-          "size": 267328
-        }
-      ],
-      "images": [],
-      "size": "0.25 MB",
-      "version": "1.0.0",
-      "release_date": "2025-08-26T15:49:52.803387+00:00",
-      "rating": 0.0,
-      "downloads": 0,
-      "status": "published",
-      "id": "303c9841-6fa6-49b5-b521-9394e0d84a1b",
-      "slug": "altoto",
-      "created_at": "2025-08-26 17:49:52.925010",
-      "updated_at": "2025-09-02 08:33:24.194527",
-      "price": 0.0
-    },
-    {
       "developer_id": "d0a88c96-26ee-4f48-b425-eafd05c8ada7",
       "developer": "badrdev",
       "title": "zgzgzgzg",
@@ -449,80 +410,40 @@
     {
       "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
       "developer": "osos",
-      "title": "Osama Test",
-      "description": "GreatGame",
-      "short_description": "Fast to download",
-      "category": "strategy",
-      "platform": [
-        "windows",
-        "mac",
-        "linux"
-      ],
-      "video_url": "https://www.youtube.com/embed/tHW-gZkbpM8?si=2_6ueM9UAkUDXD6-",
-      "features": [
-        "خفيفة على الجهاز"
-      ],
-      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/thumbnail.png",
-      "game_files": [
-        {
-          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/files/1e2d1529-3afd-4127-9ecf-36b39083dcc4_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
-          "filename": "1e2d1529-3afd-4127-9ecf-36b39083dcc4_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
-          "size": 295
-        }
-      ],
-      "images": [
-        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/images/20f935d3-2568-4329-966e-48d2f9249461_Zorobin.jpg",
-        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/Osama_Test/images/627a763f-96d9-467c-ac1f-6af452106798_images.jfif"
-      ],
-      "size": "0.00 MB",
-      "version": "1.0.0",
-      "release_date": "2025-08-31T22:50:23.364605+00:00",
-      "rating": 0.0,
-      "downloads": 0,
-      "status": "published",
-      "id": "6385ff90-1199-474f-a538-a326c4f8c33a",
-      "slug": "osama-test",
-      "created_at": "2025-09-01 00:50:23.365256",
-      "updated_at": "2025-09-02 08:33:24.206547",
-      "price": 0.0
-    },
-    {
-      "developer_id": "e05756f8-cf63-4354-b5cd-4502f35ba5e0",
-      "developer": "osos",
-      "title": "LastTest",
-      "description": "لعبة جميلة جدا انصح بتجربة",
-      "short_description": "لعبة جميلة جدا لكل الاعمار",
-      "category": "puzzle",
+      "title": "first test",
+      "description": "test",
+      "short_description": "test",
+      "category": "action",
       "platform": [
         "windows",
         "mac"
       ],
-      "video_url": "https://www.youtube.com/embed/_7pEdOLOHZo?si=N0RyaaTIDCjvjfxI",
+      "video_url": "",
       "features": [],
-      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/asome/LastTest/thumbnail.jpg",
+      "thumbnail_url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/first_test/thumbnail.jpg",
       "game_files": [
         {
-          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/asome/LastTest/files/2736bbe4-7dca-431c-a6f4-41ec47072187_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
-          "filename": "2736bbe4-7dca-431c-a6f4-41ec47072187_96fc9819-3125-49e2-9fb3-99a6cd4cb161_TestGame.zip",
-          "size": 295
+          "url": "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/first_test/files/8f79deaa-ee63-42dc-a1a5-c6727f9db8e0_Slena.zip",
+          "filename": "8f79deaa-ee63-42dc-a1a5-c6727f9db8e0_Slena.zip",
+          "size": 45425828
         }
       ],
       "images": [
-        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/asome/LastTest/images/0fbadac1-b7e9-4a98-ac65-9fe8cc789172_download-funny-cat-videos-1-638.jpg",
-        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/asome/LastTest/images/6f1b7a6f-c7f0-4fef-806f-fda950a63b6e_unknown.png"
+        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/first_test/images/b0cb8336-7bf3-4bbc-8654-f758d4bd1c0a_8f4b4ccf02fbeef30c0bf4cfc19a6a95.jpg",
+        "https://pub-9ac7a371c1c04b67bc6a06b064b191b4.r2.dev/content/osos/first_test/images/433a71a7-4a01-40ec-a116-e3b2fe34cee1_Zorobin.jpg"
       ],
-      "size": "0.00 MB",
+      "size": "43.32 MB",
       "version": "1.0.0",
-      "release_date": "2025-09-01T05:52:06.967348+00:00",
+      "release_date": "2025-09-05T06:39:22.671742+00:00",
       "rating": 0.0,
       "downloads": 0,
       "status": "published",
-      "id": "983795e1-9be0-4e86-ba1f-65def93e72ab",
-      "slug": "lasttest",
-      "created_at": "2025-09-01 07:52:06.968733",
-      "updated_at": "2025-09-02 08:33:24.218264",
+      "id": "a170225a-6982-4c2f-ad29-4cd1ba1f83a1",
+      "slug": "first-test",
+      "created_at": "2025-09-05 08:39:22.672333",
+      "updated_at": "2025-09-05 08:39:22.672339",
       "price": 0.0
     }
   ],
-  "last_updated": "2025-09-02 08:33:24.218274"
+  "last_updated": "2025-09-05 08:41:08.528172"
 }

@@ -408,6 +408,9 @@
                                     <a href="{{ url_for('game_details', game_slug=game.slug) }}" class="btn btn-small">
                                         <i class="fas fa-eye"></i> عرض
                                     </a>
+                                    <button class="btn btn-small btn-danger" onclick="showDeleteModal('{{ game.id }}')">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -429,6 +432,17 @@
     </div>
 </div>
 
+<div id="deleteGameModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h2>تأكيد الحذف</h2>
+        <p id="deleteModalMessage">هل أنت متأكد من أنك تريد حذف هذه اللعبة؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+        <div class="modal-actions">
+            <button class="btn btn-danger" onclick="confirmDelete()">نعم، احذف</button>
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
 <!-- Password Reset Modal -->
 <div id="resetModal" class="modal">
     <div class="modal-content">
@@ -441,6 +455,82 @@
 </div>
 
 <script>
+
+// delete game
+// In account.html, add these JavaScript functions
+let gameToDelete = null;
+
+function showDeleteModal(gameId) {
+    gameToDelete = gameId;
+    document.getElementById('deleteGameModal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteGameModal').style.display = 'none';
+    gameToDelete = null;
+}
+
+function confirmDelete() {
+    if (!gameToDelete) return;
+    
+    fetch('/delete-game/' + gameToDelete, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success flash message
+            showFlashMessage('تم حذف اللعبة بنجاح', 'success');
+            // Reload the page after a short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showFlashMessage('فشل في حذف اللعبة: ' + data.message, 'error');
+        }
+        closeDeleteModal();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showFlashMessage('حدث خطأ أثناء حذف اللعبة', 'error');
+        closeDeleteModal();
+    });
+}
+
+// Function to show flash messages (similar to Flask's flash)
+function showFlashMessage(message, type) {
+    const flashContainer = document.querySelector('.flash-messages');
+    if (!flashContainer) return;
+    
+    const flashDiv = document.createElement('div');
+    flashDiv.className = `flash-message flash-${type}`;
+    flashDiv.innerHTML = `
+        <span>${message}</span>
+        <button class="flash-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    flashContainer.appendChild(flashDiv);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (flashDiv.parentNode) {
+            flashDiv.remove();
+        }
+    }, 5000);
+}
+
+// Close modal if clicked outside
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteGameModal');
+    if (event.target === modal) {
+        closeDeleteModal();
+    }
+}
 
 // Wishlist functionality
 function removeFromWishlist(gameId, button) {
@@ -1836,5 +1926,123 @@ input:checked + .slider:before {
         flex: 0 0 100%;
     }
 }
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+/* In account.html, add this CSS */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background-color: #2d2d2d;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+}
+
+.modal-content h2 {
+    color: #f0f0f0;
+    margin-bottom: 1rem;
+}
+
+.modal-content p {
+    color: #b0b0b0;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.modal-actions .btn {
+    min-width: 120px;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #f0f0f0;
+}
+
+/* Flash messages styling */
+.flash-messages {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+}
+
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.flash-success {
+    background-color: rgba(46, 198, 48, 0.9);
+    color: white;
+    border-left: 4px solid #25a328;
+}
+
+.flash-error {
+    background-color: rgba(231, 76, 60, 0.9);
+    color: white;
+    border-left: 4px solid #c0392b;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-left: 1rem;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 </style>
 {% endblock %}

@@ -52,6 +52,16 @@ class GamesDB:
         
         return game_id
     
+    def delete_game(self, game_id: str) -> bool:
+        """Delete a game"""
+        db = self._read_db()
+        for i, game in enumerate(db['games']):
+            if game['id'] == game_id:
+                del db['games'][i]
+                self._write_db(db)
+                return True
+        return False
+    
     def _generate_slug(self, title: str) -> str:
         """Generate a URL-friendly slug from the title"""
         import re

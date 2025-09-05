@@ -454,6 +454,70 @@ def account():
                          wishlist_games=wishlist_games,  # Add this line
                          user_social_media=user_social_media)
 
+@app.route('/delete-game/<game_id>', methods=['DELETE'])
+@login_required
+def delete_game(game_id):
+    """Delete a game and its files from Cloudflare R2"""
+    if not current_user.is_developer():
+        return jsonify({'success': False, 'message': 'يجب أن تكون مطوراً لحذف الألعاب'}), 403
+    
+    try:
+        from games_db import games_db
+        
+        # Get the game from database
+        game = games_db.get_game_by_id(game_id)
+        
+        if not game:
+            return jsonify({'success': False, 'message': 'اللعبة غير موجودة'}), 404
+        
+        # Check if the current user owns this game
+        if game['developer_id'] != current_user.id:
+            return jsonify({'success': False, 'message': 'ليس لديك صلاحية لحذف هذه اللعبة'}), 403
+        
+        # Delete files from Cloudflare R2
+        developer_name = current_user.username.replace(" ", "_")
+        game_title = game['title'].replace(" ", "_")
+        base_path = f"content/{developer_name}/{game_title}"
+        
+        # Delete thumbnail
+        if game.get('thumbnail_url'):
+            # Extract the thumbnail key from the URL
+            thumbnail_url = game['thumbnail_url']
+            if 'r2.cloudflarestorage.com' in thumbnail_url or 'r2.dev' in thumbnail_url:
+                # Get the path after the domain
+                url_parts = thumbnail_url.split('/')
+                thumbnail_key = '/'.join(url_parts[3:])  # Skip the protocol and domain parts
+                r2_client.delete_object(thumbnail_key)
+        
+        # Delete game files
+        if game.get('game_files'):
+            for file_info in game['game_files']:
+                file_url = file_info['url']
+                if 'r2.cloudflarestorage.com' in file_url or 'r2.dev' in file_url:
+                    url_parts = file_url.split('/')
+                    file_key = '/'.join(url_parts[3:])  # Skip the protocol and domain parts
+                    r2_client.delete_object(file_key)
+        
+        # Delete additional images
+        if game.get('images'):
+            for image_url in game['images']:
+                if 'r2.cloudflarestorage.com' in image_url or 'r2.dev' in image_url:
+                    url_parts = image_url.split('/')
+                    image_key = '/'.join(url_parts[3:])  # Skip the protocol and domain parts
+                    r2_client.delete_object(image_key)
+        
+        # Delete the game from the database
+        success = games_db.delete_game(game_id)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'تم حذف اللعبة بنجاح'})
+        else:
+            return jsonify({'success': False, 'message': 'فشل في حذف اللعبة من قاعدة البيانات'})
+            
+    except Exception as e:
+        print(f"Error deleting game: {e}")
+        return jsonify({'success': False, 'message': f'حدث خطأ أثناء حذف اللعبة: {str(e)}'}), 500
+    
 @app.route('/add-to-wishlist/<game_id>', methods=['POST'])
 @login_required
 def add_to_wishlist(game_id):

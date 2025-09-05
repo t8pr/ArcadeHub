@@ -96,6 +96,23 @@ class CloudflareR2:
             print(f"Error uploading file to R2: {e}")
             return False
     
+    def delete_object(self, object_key):
+        """Delete an object from Cloudflare R2"""
+        s3_client = self.get_client()
+        if not s3_client:
+            return False
+            
+        try:
+            s3_client.delete_object(
+                Bucket=self.bucket_name,
+                Key=object_key
+            )
+            print(f"✅ Deleted object: {object_key}")
+            return True
+        except Exception as e:
+            print(f"❌ Error deleting object {object_key}: {e}")
+            return False
+
     def generate_presigned_url(self, object_key, expiration=3600):
         """Generate a presigned URL for downloading files"""
         s3_client = self.get_client()
