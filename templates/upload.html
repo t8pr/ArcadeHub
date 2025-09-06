@@ -32,7 +32,7 @@
                 
                 <div class="form-group">
                     <label for="shortDescription">وصف مختصر *</label>
-                    <textarea id="shortDescription" name="short_description" rows="2" required placeholder="وصف مختصر للعبة سيظهر في صفحة الألعاب"></textarea>
+                    <textarea maxlength="30" id="shortDescription" name="short_description" rows="2" required placeholder="وصف مختصر للعبة سيظهر في صفحة الألعاب 30 حرف فقط"></textarea>
                 </div>
             </div>
 
@@ -62,8 +62,6 @@
                             <option value="windows">Windows</option>
                             <option value="mac">Mac</option>
                             <option value="linux">Linux</option>
-                            <option value="android">Android</option>
-                            <option value="ios">iOS</option>
                             <option value="web">Web</option>
                         </select>
                         <small class="input-hint">اضغط Ctrl لاختيار أكثر من منصة</small>

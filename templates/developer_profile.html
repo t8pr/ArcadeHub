@@ -18,7 +18,7 @@
             </div>
             <div class="developer-info">
                 <h1>{{ developer.username }}</h1>
-                <p class="developer-bio">{{ developer.bio or 'مطور ألعاب في منصة SaudiArcade' }}</p>
+                <p class="developer-bio">{{ developer.bio or 'مطور ألعاب في منصة Arcadehub' }}</p>
                 
                 <div class="developer-stats">
                     <div class="stat">
@@ -309,7 +309,7 @@ function shareDeveloper() {
 
 function shareOnTwitter() {
     const url = encodeURIComponent('{{ url_for("developer_profile", username=developer.username, _external=True) }}');
-    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على Arcadehub');
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
 }
 
@@ -319,7 +319,7 @@ function shareOnLinkedIn() {
 }
 
 function shareOnWhatsApp() {
-    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على SaudiArcade');
+    const text = encodeURIComponent('تعرف على مطور الألعاب {{ developer.username }} على Arcadehub');
     const url = encodeURIComponent('{{ url_for("developer_profile", username=developer.username, _external=True) }}');
     window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
 }

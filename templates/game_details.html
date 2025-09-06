@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ game.title }} - SaudiArcade{% endblock %}
+{% block title %}{{ game.title }} - Arcadehub{% endblock %}
 
 {% block content %}
 <div class="game-details-container">
@@ -183,7 +183,7 @@
                 </div>
                 <div class="developer-details">
                     <h3>{{ game.developer }}</h3>
-                    <p>مطور ألعاب على منصة SaudiArcade</p>
+                    <p>مطور ألعاب على منصة Arcadehub</p>
                     <a class="view-profile-btn" href="{{ url_for('developer_profile', username=game.developer) }}">
                         عرض الملف الشخصي
                     </a>
@@ -430,7 +430,7 @@ function shareGame(gameId) {
     if (navigator.share) {
         navigator.share({
             title: '{{ game.title }}',
-            text: 'اكتشف هذه اللعبة الرائعة على SaudiArcade',
+            text: 'اكتشف هذه اللعبة الرائعة على Arcadehub',
             url: window.location.href
         });
     } else {

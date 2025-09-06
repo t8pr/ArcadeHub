@@ -963,11 +963,11 @@ def send_otp_email(email, otp_code, username):
         msg = MIMEMultipart()
         
         # Set subject with proper encoding for Arabic
-        subject = "رمز التحقق - SaudiArcade"
+        subject = "رمز التحقق - Arcadehub"
         msg['Subject'] = Header(subject, 'utf-8')
         
         # Set from and to with proper encoding
-        msg['From'] = Header("SaudiArcade", 'utf-8')
+        msg['From'] = Header("Arcadehub", 'utf-8')
         msg['To'] = Header(email, 'utf-8')
         
         # Create email body with Arabic text
@@ -981,7 +981,7 @@ def send_otp_email(email, otp_code, username):
         إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد.
         
         شكراً لك،
-        فريق منصة سعودي أركيد
+        فريق منصة هوب أركيد
         """
         
         # Create both plain text and HTML versions
