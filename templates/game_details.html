@@ -24,13 +24,39 @@
             </div>
             
             <div class="game-meta">
-                <div class="rating">
-                    <div class="stars">
-                        {% for i in range(5) %}
-                        <i class="fas fa-star{% if i >= game.rating %}-o{% endif %}"></i>
-                        {% endfor %}
+                <div class="game-rating-section">
+                    <h3><i class="fas fa-star"></i> تقييم اللعبة</h3>
+                    
+                    <div class="rating-container">
+                        <!-- Overall Rating -->
+                        <div class="overall-rating">
+                            <div class="rating-display">
+                                <span class="rating-value">{{ game.rating }}</span>
+                                <span class="rating-max">/5</span>
+                            </div>
+                            <div class="stars">
+                                {% for i in range(5) %}
+                                <i class="fas fa-star{% if i >= game.rating %}-o{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="rating-count">{{ game.rating_count|default(0) }} تقييم</div>
+                        </div>
+                        
+                        <!-- User Rating -->
+                        <div class="user-rating">
+                            <p class="rating-label">قيم هذه اللعبة:</p>
+                            <div class="rating-stars" id="userRatingStars">
+                                {% for i in range(1, 6) %}
+                                <i class="far fa-star" data-rating="{{ i }}"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="rating-status" id="ratingStatus">
+                                {% if not current_user.is_authenticated %}
+                                <a href="{{ url_for('login') }}">سجل الدخول لتتمكن من التقييم</a>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <span>{{ game.rating }}/5</span>
                 </div>
                 <div class="downloads">
                     <i class="fas fa-download"></i>
@@ -243,6 +269,212 @@
 </div>
 
 <script>
+
+// Rating functionality
+// Rating functionality
+let currentUserRating = 0;
+let selectedRating = 0;
+
+// Initialize rating system
+function initRatingSystem() {
+    // Load user's rating if logged in
+    if (CURRENT_USER_ID) {
+        loadUserRating();
+    }
+    
+    // Setup star hover and click events
+    const stars = document.querySelectorAll('#userRatingStars i');
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', handleStarHover);
+        star.addEventListener('mouseleave', handleStarLeave);
+        star.addEventListener('click', handleStarClick);
+    });
+}
+
+// Handle star hover
+function handleStarHover(e) {
+    if (!CURRENT_USER_ID) return;
+    
+    const rating = parseInt(e.target.getAttribute('data-rating'));
+    highlightStars(rating);
+    updateRatingStatus(`تقييم: ${rating} نجوم`, 'preview');
+}
+
+// Handle star leave
+function handleStarLeave() {
+    if (!CURRENT_USER_ID) return;
+    
+    highlightStars(selectedRating || currentUserRating);
+    
+    if (selectedRating && selectedRating !== currentUserRating) {
+        updateRatingStatus(`${selectedRating} نجوم`, 'confirm');
+    } else if (currentUserRating) {
+        updateRatingStatus(`تقييمك: ${currentUserRating} نجوم`, 'current');
+    } else {
+        updateRatingStatus('قيم هذه اللعبة', 'default');
+    }
+}
+
+// Handle star click
+function handleStarClick(e) {
+    if (!CURRENT_USER_ID) {
+        window.location.href = "{{ url_for('login') }}";
+        return;
+    }
+    
+    selectedRating = parseInt(e.target.getAttribute('data-rating'));
+    
+    // if (selectedRating === currentUserRating) {
+        // User clicked their current rating - ask if they want to remove it
+    //    if (confirm('هل تريد إزالة تقييمك؟')) {
+    //        removeRating();
+    //    }
+    //    return;
+    //}
+    
+    highlightStars(selectedRating);
+    updateRatingStatus(`${selectedRating} نجوم`, 'confirm');
+    
+    // Submit rating after a brief delay
+    clearTimeout(window.ratingTimeout);
+    window.ratingTimeout = setTimeout(() => {
+        submitRating();
+    }, 1500);
+}
+
+// Highlight stars based on rating
+function highlightStars(rating) {
+    const stars = document.querySelectorAll('#userRatingStars i');
+    stars.forEach((star, index) => {
+        const starRating = parseInt(star.getAttribute('data-rating'));
+        if (starRating <= rating) {
+            star.classList.remove('far', 'fa-star-o');
+            star.classList.add('fas', 'fa-star', 'active');
+        } else {
+            star.classList.remove('fas', 'fa-star', 'active');
+            star.classList.add('far', 'fa-star');
+        }
+    });
+}
+
+// Submit rating
+function submitRating() {
+    if (!selectedRating) return;
+    
+    fetch(`/api/game/${GAME_ID}/rate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating: selectedRating })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            currentUserRating = selectedRating;
+            updateRatingStatus('تم تقييم اللعبة بنجاح!', 'success');
+            
+            // Reload page after a delay to update overall rating
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            updateRatingStatus('فشل في إضافة التقييم', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        updateRatingStatus('حدث خطأ في إضافة التقييم', 'error');
+    });
+}
+
+// Remove rating
+function removeRating() {
+    fetch(`/api/game/${GAME_ID}/rate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating: 0 }) // 0 means remove rating
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            currentUserRating = 0;
+            selectedRating = 0;
+            highlightStars(0);
+            updateRatingStatus('تم إزالة التقييم', 'success');
+            
+            // Reload page after a delay to update overall rating
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            updateRatingStatus('فشل في إزالة التقييم', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        updateRatingStatus('حدث خطأ في إزالة التقييم', 'error');
+    });
+}
+
+// Load user's current rating
+function loadUserRating() {
+    fetch(`/api/game/${GAME_ID}/user-rating`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.rating > 0) {
+            currentUserRating = data.rating;
+            highlightStars(currentUserRating);
+            updateRatingStatus(`تقييمك: ${currentUserRating} نجوم`, 'current');
+        } else {
+            updateRatingStatus('قيم هذه اللعبة', 'default');
+        }
+    })
+    .catch(error => console.error('Error loading user rating:', error));
+}
+
+// Update rating status message
+function updateRatingStatus(message, type) {
+    const statusElement = document.getElementById('ratingStatus');
+    
+    if (!statusElement) return;
+    
+    // Clear previous content
+    statusElement.innerHTML = '';
+    
+    // Add new content based on type
+    const messageSpan = document.createElement('span');
+    messageSpan.textContent = message;
+    messageSpan.className = `status-${type}`;
+    
+    statusElement.appendChild(messageSpan);
+    
+    // Add cancel button for confirm state
+    if (type === 'confirm') {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        cancelBtn.className = 'cancel-rating';
+        cancelBtn.onclick = function(e) {
+            e.stopPropagation();
+            selectedRating = 0;
+            highlightStars(currentUserRating);
+            if (currentUserRating) {
+                updateRatingStatus(`تقييمك: ${currentUserRating} نجوم`, 'current');
+            } else {
+                updateRatingStatus('قيم هذه اللعبة', 'default');
+            }
+        };
+        statusElement.appendChild(cancelBtn);
+    }
+}
+
+// Initialize rating system when page loads
+document.addEventListener('DOMContentLoaded', initRatingSystem);
+
 const CURRENT_USER_ID = "{{ current_user.id if current_user.is_authenticated else '' }}";
 const GAME_DEVELOPER_ID = "{{ game.developer_id }}";
 const GAME_ID = "{{ game.id }}";
@@ -530,6 +762,8 @@ document.addEventListener('keydown', function(e) {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     flex-wrap: wrap;
     flex-direction: column;
+    align-content: center;
+    align-items: center;
 }
 
 @media (max-width: 968px) {
@@ -537,6 +771,10 @@ document.addEventListener('keydown', function(e) {
         grid-template-columns: 1fr;
         text-align: center;
     }
+}
+
+.game-cover {
+    width: 100%;
 }
 
 .game-cover img {
@@ -1022,7 +1260,11 @@ document.addEventListener('keydown', function(e) {
         padding: 1.5rem;
         display: grid;
     }
-    
+    .game-info {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+    }
     .game-info h1 {
         font-size: 1.5rem;
     }
@@ -1263,6 +1505,220 @@ document.addEventListener('keydown', function(e) {
 .btn-hide:hover, .btn-unhide:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
 .btn-delete:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
 
+/* Rating Section Styles */
+/* Simplified Rating Section Styles */
+.game-rating-section {
+    background: #2d2d2d;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #3d3d3d;
+}
+
+.game-rating-section h3 {
+    color: #f0f0f0;
+    margin: 0 0 1.2rem 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.game-rating-section h3 i {
+    color: #f39c12;
+}
+
+.rating-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.overall-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.rating-display {
+    display: flex;
+    align-items: baseline;
+    gap: 0.2rem;
+}
+
+.rating-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #f39c12;
+}
+
+.rating-max {
+    color: #8f8f8f;
+    font-size: 1rem;
+}
+
+.overall-rating .stars {
+    color: #f39c12;
+    font-size: 1.1rem;
+    margin: 0.2rem 0;
+    display: flex;
+    gap: 0.2rem;
+}
+
+.rating-count {
+    color: #8f8f8f;
+    font-size: 0.85rem;
+}
+
+.user-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.rating-label {
+    color: #b0b0b0;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.rating-stars i {
+    color: #555;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rating-stars i:hover {
+    color: #f39c12 !important;
+    transform: scale(1.1);
+}
+
+.rating-stars i.active {
+    color: #f39c12 !important;
+}
+
+.rating-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 1.5rem;
+    margin: 0;
+    text-align: center;
+}
+
+.rating-status a {
+    color: #2EC630;
+    text-decoration: none;
+}
+
+.rating-status a:hover {
+    text-decoration: underline;
+}
+
+.rating-status span {
+    font-size: 0.9rem;
+}
+
+.status-default {
+    color: #b0b0b0 !important;
+}
+
+.status-preview {
+    color: #f39c12 !important;
+}
+
+.status-confirm {
+    color: #2EC630 !important;
+    font-weight: 500;
+}
+
+.status-current {
+    color: #3498db !important;
+}
+
+.status-success {
+    color: #2EC630 !important;
+}
+
+.status-error {
+    color: #e74c3c !important;
+}
+
+.cancel-rating {
+    background: none;
+    border: none;
+    color: #8f8f8f;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.cancel-rating:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+/* Make sure the stars are properly aligned */
+.rating-stars {
+    direction: ltr; /* Important for star alignment in RTL layout */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-rating-section {
+        padding: 1.2rem;
+    }
+    
+    .rating-stars i {
+        font-size: 1.4rem;
+    }
+    
+    .rating-value {
+        font-size: 1.6rem;
+    }
+    
+    .rating-container {
+        gap: 1rem;
+    }
+    
+    .overall-rating,
+    .user-rating {
+        padding: 0.8rem;
+    }
+}
+
+/* Animation for rating changes */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.rating-stars i.active {
+    animation: pulse 0.3s ease;
+}
 
 </style>
 {% endblock %}

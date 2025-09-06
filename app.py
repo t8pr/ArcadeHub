@@ -1501,6 +1501,113 @@ def games():
     
     return render_template('games.html', games=all_games)
 
+@app.route('/api/game/<game_id>/rate', methods=['POST'])
+@login_required
+def rate_game(game_id):
+    """Rate a game or update existing rating"""
+    try:
+        rating = request.json.get('rating')
+        
+        if not rating or not (1 <= int(rating) <= 5):
+            return jsonify({'success': False, 'message': 'Rating must be between 1 and 5'})
+        
+        # Check if game exists in local database
+        from games_db import games_db
+        game = games_db.get_game_by_id(game_id)
+        if not game:
+            return jsonify({'success': False, 'message': 'Game not found'})
+        
+        # Check if user already rated this game
+        existing_rating = supabase_client.table('game_ratings').select('*').eq('game_id', game_id).eq('user_id', current_user.id).execute()
+        
+        if existing_rating.data:
+            # Update existing rating
+            update_response = supabase_client.table('game_ratings').update({
+                'rating': rating,
+                'updated_at': datetime.now(timezone.utc).isoformat()
+            }).eq('game_id', game_id).eq('user_id', current_user.id).execute()
+            
+            if update_response.data:
+                # Update game average rating in local database
+                update_game_rating(game_id)
+                return jsonify({'success': True, 'message': 'تم تحديث التقييم بنجاح', 'action': 'updated'})
+            else:
+                return jsonify({'success': False, 'message': 'فشل في تحديث التقييم'})
+        else:
+            # Create new rating
+            rating_data = {
+                'game_id': game_id,
+                'user_id': current_user.id,
+                'rating': rating
+            }
+            
+            insert_response = supabase_client.table('game_ratings').insert(rating_data).execute()
+            
+            if insert_response.data:
+                # Update game average rating in local database
+                update_game_rating(game_id)
+                return jsonify({'success': True, 'message': 'تم إضافة التقييم بنجاح', 'action': 'added'})
+            else:
+                return jsonify({'success': False, 'message': 'فشل في إضافة التقييم'})
+                
+    except Exception as e:
+        print(f"Error rating game: {e}")
+        return jsonify({'success': False, 'message': 'فشل في إضافة التقييم'})
+
+@app.route('/api/game/<game_id>/user-rating')
+@login_required
+def get_user_rating(game_id):
+    """Get the current user's rating for a game"""
+    try:
+        response = supabase_client.table('game_ratings').select('rating').eq('game_id', game_id).eq('user_id', current_user.id).execute()
+        
+        if response.data:
+            return jsonify({'success': True, 'rating': response.data[0]['rating']})
+        else:
+            return jsonify({'success': True, 'rating': 0})
+            
+    except Exception as e:
+        print(f"Error getting user rating: {e}")
+        return jsonify({'success': False, 'message': 'Failed to get rating'})
+
+def add_rating_count_to_games():
+    """Add rating_count field to all existing games"""
+    try:
+        with open('games_database.json', 'r', encoding='utf-8') as f:
+            db = json.load(f)
+        
+        for game in db['games']:
+            if 'rating_count' not in game:
+                game['rating_count'] = 0
+        
+        with open('games_database.json', 'w', encoding='utf-8') as f:
+            json.dump(db, f, ensure_ascii=False, indent=2)
+        
+        print("✅ Added rating_count to all games")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+def update_game_rating(game_id):
+    """Update the average rating and rating count for a game"""
+    try:
+        # Get all ratings for this game
+        response = supabase_client.table('game_ratings').select('rating').eq('game_id', game_id).execute()
+        
+        if response.data:
+            ratings = [r['rating'] for r in response.data]
+            average_rating = sum(ratings) / len(ratings)
+            
+            # Update the game in local database
+            from games_db import games_db
+            games_db.update_game(game_id, {
+                'rating': round(average_rating, 1),
+                'rating_count': len(ratings),
+                'updated_at': datetime.now(timezone.utc).isoformat()
+            })
+            
+    except Exception as e:
+        print(f"Error updating game rating: {e}")
+
 @app.route('/games/<game_slug>')
 def game_details(game_slug):
     """Display game details"""

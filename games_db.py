@@ -46,6 +46,7 @@ class GamesDB:
         game_data.setdefault('downloads', 0)
         game_data.setdefault('status', 'published')
         game_data.setdefault('price', 0.0)
+        game_data.setdefault('rating_count', 0)
         
         db['games'].append(game_data)
         self._write_db(db)
