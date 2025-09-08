@@ -259,11 +259,20 @@ function validateForm() {
 </script>
 
 <style>
+    
 .type-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+@media (max-width: 480px) {
+    .type-options {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
 }
 
 .option-card {
