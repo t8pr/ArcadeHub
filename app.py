@@ -1318,12 +1318,19 @@ def download_game(game_id):
             flash('لا توجد ملفات متاحة للتحميل', 'error')
             return redirect(url_for('game_details', game_slug=game['slug']))
 
+        # Increment download count
+        current_downloads = game.get('downloads', 0)
+        games_db.update_game(game_id, {
+            'downloads': current_downloads + 1,
+            'updated_at': datetime.now(timezone.utc).isoformat()
+        })
+        
         # الملف الرئيسي للتحميل
         main_file = game['game_files'][0]
-        file_url = main_file['url']  # الرابط العام للملف
+        file_url = main_file['url']
 
         # إعادة التوجيه مباشرة للرابط الثابت
-        return redirect(main_file['url'])
+        return redirect(file_url)
 
     except Exception as e:
         flash(f'حدث خطأ أثناء التحميل: {str(e)}', 'error')

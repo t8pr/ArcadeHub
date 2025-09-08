@@ -79,7 +79,7 @@
             <div class="game-actions">
                 <button class="btn-download-primary" onclick="downloadGame('{{ game.id }}')">
                     <i class="fas fa-download"></i>
-                    تحميل مجاني
+                    حمل اللعبة
                 </button>
                 
                 <div class="secondary-actions">
@@ -184,7 +184,7 @@
 
         <!-- Download Options -->
         <section class="download-options">
-            <h2><i class="fas fa-download"></i> خيارات التحميل</h2>
+            <h2><i class="fas fa-download"></i>الملفات</h2>
             <div class="download-buttons">
                 {% if game.game_files and game.game_files|length > 0 %}
                     {% for file in game.game_files %}
@@ -261,9 +261,6 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-        </div>
-        <div class="modal-actions">
-            <button onclick="closeDownloadModal()" class="btn-cancel">إلغاء</button>
         </div>
     </div>
 </div>
