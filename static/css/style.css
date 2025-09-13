@@ -1,3 +1,6 @@
+/* Main color #151534 */
+/* Second color #ff425d */
+
 /* Base Styles */
 * {
     margin: 0;
@@ -89,7 +92,7 @@ nav {
     height: 2px;
     bottom: 0;
     right: 0;
-    background-color: #003522;
+    background-color: #ff425d;
     transition: width 0.3s;
 }
 
@@ -183,7 +186,7 @@ footer {
     grid-column: span 2;
     min-height: 250px;
     justify-content: center;
-    background: linear-gradient(135deg, #2EC630 , #003522 );
+    background: linear-gradient(135deg, #ff425d, #151534);
     color: white;
 }
 
@@ -252,7 +255,7 @@ footer {
 }
 
 .btn {
-    background-color: #01432b;
+    background-color: #151534;
     color: white;
     border: none;
     padding: 0.6rem 1.2rem;
@@ -260,16 +263,16 @@ footer {
     cursor: pointer;
     font-family: 'Tajawal', sans-serif;
     font-weight: 500;
-    transition: background-color 0.3s;
+    transition: 0.3s;
     text-decoration: none;
 }
 
 .btn:hover {
-    background-color: #025a3a;
+    background-color: #ff425d;
 }
 
 .fa-trophy:before, .fa-award:before, .fa-users:before,.fa-upload:before {
-    color: #2EC630 ;
+    color: #ff425d ;
 }
 
 /* Status Bar Styles */
@@ -296,7 +299,7 @@ footer {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    color: #2EC630;
+    color: #ff425d;
     animation: counter 1s ease-out;
 }
 
@@ -1399,7 +1402,7 @@ body.menu-open {
 }
 
 .auth-card h1 i {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 .section-label {
@@ -1714,197 +1717,6 @@ body.menu-open {
 .social-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Login Specific Styles */
-.auth-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.auth-header h1 {
-    color: #f0f0f0;
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-}
-
-.auth-header p {
-    color: #b0b0b0;
-    font-size: 1rem;
-    margin: 0;
-}
-
-/* Input Fields */
-.input-with-icon {
-    position: relative;
-}
-
-.input-with-icon .icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #8f8f8f;
-    font-size: 1rem;
-}
-
-.input-with-icon input {
-    width: 100%;
-    padding: 0.8rem 1rem 0.8rem 2.5rem;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background: #3d3d3d;
-    color: #f0f0f0;
-    font-family: 'Tajawal', sans-serif;
-    transition: all 0.3s;
-}
-
-.input-with-icon input:focus {
-    border-color: #2EC630;
-    box-shadow: 0 0 0 2px rgba(46, 198, 48, 0.2);
-    outline: none;
-}
-
-/* Password Toggle */
-.password-toggle {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #8f8f8f;
-    z-index: 2;
-}
-
-/* Form Options */
-.form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
-}
-
-.remember-me {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.remember-me input {
-    width: auto;
-}
-
-.remember-me label {
-    color: #b0b0b0;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-
-.forgot-password {
-    color: #2EC630;
-    font-size: 0.9rem;
-    text-decoration: none;
-}
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-/* Login Button */
-.btn-login {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    background: #2EC630;
-    border: none;
-    margin-top: 1.5rem;
-    transition: all 0.3s;
-}
-
-.btn-login:hover {
-    background: #25a328;
-    transform: translateY(-2px);
-}
-
-/* Divider */
-.auth-divider {
-    display: flex;
-    align-items: center;
-    margin: 1.5rem 0;
-    color: #b0b0b0;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-    content: "";
-    flex: 1;
-    border-bottom: 1px solid #444;
-}
-
-.auth-divider span {
-    padding: 0 1rem;
-    font-size: 0.9rem;
-}
-
-/* Social Login */
-.social-login {
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.social-login p {
-    color: #b0b0b0;
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-}
-
-.social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.social-btn {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.2rem;
-    transition: all 0.3s;
-}
-
-.social-btn.google { background: #DB4437; }
-.social-btn.twitter { background: #1DA1F2; }
-.social-btn.github { background: #333; }
-
-.social-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Auth Footer */
-.auth-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    color: #b0b0b0;
-    font-size: 0.95rem;
-}
-
-.auth-footer a {
-    color: #2EC630;
-    text-decoration: none;
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
 }
 
 /* Game Details Page - Enhanced Styles */
@@ -2921,7 +2733,7 @@ body.menu-open {
     height: 100%;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #2EC630;
+    border-top-color: #151534;
     animation: spin 1s linear infinite;
 }
 
@@ -2935,7 +2747,7 @@ body.menu-open {
     height: 100%;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #3498db;
+    border-top-color: #ff425d;
     animation: spin 0.5s linear infinite reverse;
     opacity: 0.7;
 }
@@ -2947,9 +2759,17 @@ body.menu-open {
     color: #f0f0f0;
 }
 
+.logobox {
+    background-color: #ff425d;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .loader-logo {
-    width: 60px;
-    height: 60px;
+    width: 30%;
+    height: 30%;
     margin-bottom: 15px;
     border-radius: 12px;
     animation: pulse 1.5s ease-in-out infinite alternate;
