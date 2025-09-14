@@ -972,6 +972,7 @@ def send_otp_email(email, otp_code, username):
         
         # Create email body with Arabic text
         arabic_body = f"""
+
         مرحباً {username},
         
         رمز التحقق الخاص بك هو: {otp_code}
@@ -981,7 +982,7 @@ def send_otp_email(email, otp_code, username):
         إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد.
         
         شكراً لك،
-        فريق منصة هوب أركيد
+        فريق منصة أركيد هوب
         """
         
         # Create both plain text and HTML versions

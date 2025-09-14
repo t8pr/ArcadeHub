@@ -27,6 +27,9 @@ body {
     padding: 0 15px;
 }
 
+
+
+
 /* Header Styles */
 header {
     background-color: #1e1e1e;
@@ -265,10 +268,11 @@ footer {
     font-weight: 500;
     transition: 0.3s;
     text-decoration: none;
+    border-radius: 10px;
 }
 
 .btn:hover {
-    background-color: #ff425d;
+    background-color: #ff425eda;
 }
 
 .fa-trophy:before, .fa-award:before, .fa-users:before,.fa-upload:before {
@@ -398,7 +402,7 @@ footer {
 
 .upload-area i {
     font-size: 2.5rem;
-    color: #2ec630;
+    color: #ff425d;
     margin-bottom: 1rem;
 }
 
@@ -582,7 +586,7 @@ footer {
 }
 
 .price.free {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 /* Pagination Styles */
@@ -647,7 +651,7 @@ footer {
 
 .developer-card {
     display: flex;
-    background: linear-gradient(135deg, #003522 0%, #2EC630 100%);
+    background: linear-gradient(135deg, #003522 0%, #ff425d 100%);
     align-items: center;
     gap: 1.5rem;
     background: #3d3d3d;
@@ -842,6 +846,32 @@ footer {
     border: none;
 }
 
+/* Input Fields */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8f8f8f;
+    font-size: 1rem;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #3d3d3d;
+    color: #f0f0f0;
+    font-family: 'Tajawal', sans-serif;
+    transition: all 0.3s;
+}
+
+
 /* Screenshots Section */
 .screenshots-section {
     margin: 3rem 0;
@@ -974,7 +1004,7 @@ footer {
 }
 
 .developer-card {
-    background: linear-gradient(135deg, #003522 0%, #2EC630 100%);
+    background: linear-gradient(135deg, #003522 0%, #ff425d 100%);
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -1092,7 +1122,7 @@ footer {
 }
 
 .spec-label {
-    color: #2EC630;
+    color: #ff425d;
     font-size: 0.85rem;
     margin-bottom: 0.3rem;
 }
@@ -1192,7 +1222,7 @@ footer {
 }
 
 .btn-review {
-    background: #2EC630;
+    background: #ff425d;
     padding: 0.8rem 2rem;
     font-weight: bold;
 }
@@ -1450,8 +1480,7 @@ body.menu-open {
 }
 
 .form-group input:focus {
-    border-color: #2EC630;
-    box-shadow: 0 0 0 2px rgba(46, 198, 48, 0.2);
+    border-color: #ff425d;
     outline: none;
 }
 
@@ -1515,30 +1544,6 @@ body.menu-open {
     background: #3d3d3d;
 }
 
-.type-option input:checked + .option-card {
-    border-color: #2EC630;
-    background: rgba(46, 198, 48, 0.1);
-}
-
-.option-card i {
-    font-size: 2rem;
-    color: #2EC630;
-    margin-bottom: 0.8rem;
-}
-
-.option-card span {
-    display: block;
-    font-weight: 600;
-    color: #f0f0f0;
-    margin-bottom: 0.3rem;
-}
-
-.option-card p {
-    color: #b0b0b0;
-    font-size: 0.85rem;
-    margin: 0;
-}
-
 /* Developer Fields */
 .developer-fields {
     display: none;
@@ -1546,7 +1551,7 @@ body.menu-open {
     padding: 1.5rem;
     background: rgba(46, 198, 48, 0.05);
     border-radius: 8px;
-    border: 1px dashed #2EC630;
+    border: 1px dashed #ff425d;
 }
 
 .section-title {
@@ -1559,7 +1564,7 @@ body.menu-open {
 }
 
 .section-title i {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 /* Terms Checkbox */
@@ -1597,8 +1602,8 @@ body.menu-open {
 }
 
 .custom-checkbox input:checked ~ label {
-    background: #2EC630;
-    border-color: #2EC630;
+    background: #ff425d;
+    border-color: #ff425d;
 }
 
 .custom-checkbox label:after {
@@ -1624,7 +1629,7 @@ body.menu-open {
 }
 
 .terms-label a {
-    color: #2EC630;
+    color: #ff425d;
     text-decoration: none;
 }
 
@@ -1638,13 +1643,14 @@ body.menu-open {
     padding: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
-    background: #2EC630;
+    background: #151534;
     border: none;
     transition: all 0.3s;
+    border-radius: 12px;
 }
 
 .btn-register:hover {
-    background: #25a328;
+    background: #10103b;
     transform: translateY(-2px);
 }
 
@@ -1657,7 +1663,7 @@ body.menu-open {
 }
 
 .auth-footer a {
-    color: #2EC630;
+    color: #ff425d;
     text-decoration: none;
 }
 
@@ -1767,7 +1773,7 @@ body.menu-open {
 }
 
 .btn-download-main {
-    background: #2EC630;
+    background: #ff425d;
     color: white;
     padding: 0.8rem 1.5rem;
     font-weight: bold;
@@ -1777,10 +1783,10 @@ body.menu-open {
 
 .btn-download-secondary {
     background: transparent;
-    color: #2EC630;
+    color: #ff425d;
     padding: 0.8rem 1.5rem;
     font-weight: bold;
-    border: 2px solid #2EC630;
+    border: 2px solid #ff425d;
     border-radius: 8px;
 }
 
@@ -1854,7 +1860,7 @@ body.menu-open {
 }
 
 .features-list li i {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 /* Right Column Styles */
@@ -1938,7 +1944,7 @@ body.menu-open {
 }
 
 .spec-label {
-    color: #2EC630;
+    color: #ff425d;
     font-size: 0.9rem;
     margin-bottom: 0.3rem;
     display: flex;
@@ -2058,7 +2064,7 @@ body.menu-open {
 }
 
 .btn-submit-review {
-    background: #2EC630;
+    background: #ff425d;
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -2163,15 +2169,6 @@ body.menu-open {
     border: 1px solid #3a3a3a;
 }
 
-.developer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.5rem;
-    background: linear-gradient(to right, #003522, #01432b);
-    border-bottom: 1px solid #005a3a;
-}
-
 .section-title {
     color: #fff;
     font-size: 1.2rem;
@@ -2183,7 +2180,7 @@ body.menu-open {
 
 .developer-badge {
     background: rgba(255, 255, 255, 0.1);
-    color: #2EC630;
+    color: #ff425d;
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -2224,7 +2221,7 @@ body.menu-open {
 }
 
 .developer-status.online {
-    background: #2EC630;
+    background: #ff425d;
 }
 
 .developer-status.offline {
@@ -2259,7 +2256,7 @@ body.menu-open {
 }
 
 .stat-value {
-    color: #2EC630;
+    color: #ff425d;
     font-weight: bold;
     font-size: 1.1rem;
 }
@@ -2277,7 +2274,7 @@ body.menu-open {
 }
 
 .btn-follow {
-    background: #2EC630;
+    background: #ff425d;
     color: white;
     border: none;
     padding: 0.7rem 1.2rem;
@@ -2308,7 +2305,7 @@ body.menu-open {
 }
 
 .btn-follow:hover {
-    background: #25a328;
+    background: #ff425d;
     transform: translateY(-2px);
 }
 
@@ -2516,7 +2513,7 @@ body.menu-open {
 }
 
 .back-link:hover {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 .email-confirmation {
@@ -2525,11 +2522,11 @@ body.menu-open {
     border-radius: 8px;
     margin-bottom: 1.5rem;
     text-align: center;
-    border: 1px solid #2EC630;
+    border: 1px solid #ff425d;
 }
 
 .email-confirmation i {
-    color: #2EC630;
+    color: #ff425d;
     margin-left: 0.5rem;
 }
 /* Form styling */
@@ -2549,7 +2546,7 @@ body.menu-open {
 
 .info-item label {
     font-weight: bold;
-    color: #2EC630;
+    color: #ff425d;
     min-width: 120px;
 }
 
@@ -2562,7 +2559,7 @@ body.menu-open {
 #username-edit {
     width: 100%;
     padding: 0.5rem;
-    border: 2px solid #2EC630;
+    border: 2px solid #ff425d;
     border-radius: 4px;
     background: #2d2d2d;
     color: #f0f0f0;
@@ -2601,7 +2598,7 @@ body.menu-open {
 .social-media-form label i {
     width: 20px;
     text-align: center;
-    color: #2EC630;
+    color: #ff425d;
 }
 
 
@@ -2618,7 +2615,7 @@ body.menu-open {
 
 .social-media-form input:focus {
     outline: none;
-    border-color: #2EC630;
+    border-color: #ff425d;
 }
 
 /* Social Links in Profile */
@@ -2643,7 +2640,7 @@ body.menu-open {
 
 .social-link:hover {
     transform: translateY(-3px);
-    background: #2EC630;
+    background: #ff425d;
     color: white;
 }
 

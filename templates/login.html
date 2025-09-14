@@ -159,8 +159,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .input-with-icon input:focus {
-    border-color: #;
-    box-shadow: 0 0 0 3px rgba(46, 198, 48, 0.2);
     outline: none;
 }
 
@@ -184,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .password-toggle:hover {
-    color: #2EC630;
+    color: #ff425d;
 }
 
 /* Forgot Password Link */
@@ -194,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .forgot-password-link {
-    color: #2EC630;
+    color: #ff425d;
     text-decoration: none;
     font-size: 0.9rem;
     display: inline-flex;
@@ -204,8 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .forgot-password-link:hover {
-    color: #25a328;
-    text-decoration: underline;
+    color: #d4344c;
 }
 
 /* Login Button */
@@ -254,12 +251,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .auth-footer a {
-    color: #2EC630;
+    color: #ff425d;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 .auth-footer a:hover {
-    text-decoration: underline;
+    color: #c4354a;
+    text-decoration: none;
 }
 
 /* Alerts */
@@ -364,13 +363,8 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: scale(1.02);
 }
 
-.btn-login:focus {
-    outline: 3px solid rgba(46, 198, 48, 0.4);
-    outline-offset: 2px;
-}
-
 .forgot-password-link:focus {
-    outline: 2px solid #2EC630;
+    outline: 2px solid #ff425d;
     outline-offset: 2px;
     border-radius: 4px;
 }
