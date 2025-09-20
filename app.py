@@ -23,11 +23,13 @@ from games_db import games_db
 from werkzeug.utils import secure_filename
 import arabic_reshaper
 from bidi.algorithm import get_display
+from whitenoise import WhiteNoise
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'fallback-secret-key')
+app.wsgi_app = WhiteNoise(app.wsgi_app, root='static/')
 
 # Initialize Supabase
 supabase_url = os.getenv('SUPABASE_URL')
