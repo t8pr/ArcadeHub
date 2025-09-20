@@ -24,7 +24,7 @@
             <div class="nav-container">
                 <div class="logo-container">
                     <a href="{{ url_for('home') }}" class="logo-link">
-                        <img src="/static/images/banner.png" class="site-logo" onerror="this.style.display='none'">
+                        <img src="{{ url_for('static', filename='images/banner.png'" class="site-logo">
                     </a>
                 </div>
                 <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="قائمة الهاتف">
