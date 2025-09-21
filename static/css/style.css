@@ -1392,7 +1392,7 @@ body.menu-open {
 
 @media (max-width: 480px) {
     .site-logo {
-        height: 30px;
+        height: 40px;
     }
     .logo-text {
         font-size: 1.1rem;
